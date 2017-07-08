@@ -4,6 +4,7 @@ var numInCol = 5;
 var gameRules = {
   skyfall:  true,
   moveTime: 4,
+  minOrbs: 3,
 }
 var boardWidth = 600;
 var boardHeight = 500;

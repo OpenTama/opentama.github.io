@@ -71,7 +71,7 @@ function rollOrb() {
   return {
     color:   Math.floor(Math.random() * 6),
     enhanced: false,
-    locked: false,
+    locked: true,
     blind1: false, // Regular blind, slide orbs to reveal
     blind2: 0, // Duration blind, cannot see orbs until timer is over
     matched: false,

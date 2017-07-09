@@ -26,6 +26,18 @@ var orbAssets = [
   new Image(),
   new Image()
 ];
+var blindAssets = [
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image()
+];
 var bgAssets = [new Image(), new Image()];
 orbAssets[0].src = "assets/Orb-Fr.png";
 orbAssets[1].src = "assets/Orb-Wt.png";
@@ -37,6 +49,16 @@ orbAssets[6].src = "assets/Orb-Jammer.png";
 orbAssets[7].src = "assets/Orb-Poison.png";
 orbAssets[8].src = "assets/Orb-MPoison.png";
 orbAssets[9].src = "assets/Orb-Bomb.png";
+blindAssets[0].src = "assets/Shadow-Orb.png";
+blindAssets[1].src = "assets/Shadow-Orb.png";
+blindAssets[2].src = "assets/Shadow-Orb.png";
+blindAssets[3].src = "assets/Shadow-Orb.png";
+blindAssets[4].src = "assets/Shadow-Orb.png";
+blindAssets[5].src = "assets/Shadow-Heal.png";
+blindAssets[6].src = "assets/Shadow-Jammer.png";
+blindAssets[7].src = "assets/Shadow-Poison.png";
+blindAssets[8].src = "assets/Shadow-MPoison.png";
+blindAssets[9].src = "assets/Shadow-Bomb.png";
 bgAssets[0].src = "assets/bg0.png";
 bgAssets[1].src = "assets/bg1.png";
 
@@ -88,9 +110,15 @@ function redraw() {
       // Orb id -1 means don't draw it
       if (toDraw[i][j].color >= 0 && toDraw[i][j].color < orbAssets.length) {
         if (orbSelected != null && orbSelected.row == i && orbSelected.col == j) {
-	  renderer.globalAlpha = 0.5;
-        }
-        renderer.drawImage(orbAssets[toDraw[i][j].color],
+	  renderer.globalAlpha = 0.5; // The selected orb should be transparent
+        }   
+        var orbImage = orbAssets[toDraw[i][j].color];
+        if (toDraw[i][j].blind2 > 0){ // Duration blind overrides normal blind
+          orbImage = blindAssets[toDraw[i][j].color]; // TODO: Create specific textures for duration blind
+        } else if (toDraw[i][j].blind1){
+          orbImage = blindAssets[toDraw[i][j].color]; 
+        } 
+        renderer.drawImage(orbImage,
                            boardWidth * j / numInRow,
                            boardHeight * (i - toDraw[i][j].offset) / numInCol,
                            boardWidth / numInRow,
@@ -293,12 +321,13 @@ function getMatches() {
                 comboStats.cross = true;
             }
           }
-          if(board[i][j].enhanced)
+          if (board[i][j].enhanced) {
             comboStats.enhance += 1;
+          }
           comboStats.orbs += 1;
 	  animationList.push({timeLeft: 10,
                               type:     "erase",
-                              color:    board[i][j].color,
+                              color:    board[i][j].color, // TODO: Add support for blinds here
                               i:        i,
                               j:        j});
         } else {

@@ -152,9 +152,7 @@ function cascade(skyfall) {
           hasCascade = true;
         }
       }
-      if(board[0][j].color == -1 && 
-	
-	) {
+      if(board[0][j].color == -1 && skyfall) {
         board[0][j] = rollOrb();
         board[0][j].offset = 1;
         hasCascade = true;

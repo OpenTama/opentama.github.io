@@ -39,6 +39,7 @@ var blindAssets = [
   new Image()
 ];
 var bgAssets = [new Image(), new Image()];
+var plusAsset = new Image();
 orbAssets[0].src = "assets/Orb-Fr.png";
 orbAssets[1].src = "assets/Orb-Wt.png";
 orbAssets[2].src = "assets/Orb-Wd.png";
@@ -61,6 +62,7 @@ blindAssets[8].src = "assets/Shadow-MPoison.png";
 blindAssets[9].src = "assets/Shadow-Bomb.png";
 bgAssets[0].src = "assets/bg0.png";
 bgAssets[1].src = "assets/bg1.png";
+plusAsset.src = "assets/Mod-Plus.png";
 
 function rollOrb() {
   // TODO: adjusted skyfall rate
@@ -123,6 +125,13 @@ function redraw() {
                            boardHeight * (i - toDraw[i][j].offset) / numInCol,
                            boardWidth / numInRow,
                            boardHeight / numInCol);
+        if (toDraw[i][j].enhanced){
+          renderer.drawImage(plusAsset,
+                             boardWidth * j / numInRow,
+                             boardHeight * (i - toDraw[i][j].offset) / numInCol,
+                             boardWidth / numInRow,
+                             boardHeight / numInCol);
+        }
         renderer.globalAlpha = 1;
       }
     }
@@ -131,8 +140,15 @@ function redraw() {
     renderer.drawImage(orbAssets[toDraw[orbSelected.row][orbSelected.col].color],
                        toDraw[orbSelected.row][orbSelected.col].trueX,
                        toDraw[orbSelected.row][orbSelected.col].trueY,
-		       boardWidth / numInRow,
+                       boardWidth / numInRow,
                        boardHeight / numInCol);
+    if (orbAssets[toDraw[orbSelected.row][orbSelected.col].enhanced){
+      renderer.drawImage(plusAsset,
+                         toDraw[orbSelected.row][orbSelected.col].trueX,
+                         toDraw[orbSelected.row][orbSelected.col].trueY,
+                         boardWidth / numInRow,
+                         boardHeight / numInCol);
+    }
     if (timeLeft < .5) {
       renderer.fillStyle = "#00FF00"
       renderer.fillRect(toDraw[orbSelected.row][orbSelected.col].trueX,
@@ -327,7 +343,7 @@ function getMatches() {
           comboStats.orbs += 1;
 	  animationList.push({timeLeft: 10,
                               type:     "erase",
-                              color:    board[i][j].color, // TODO: Add support for blinds here
+                              color:    board[i][j].color, // TODO: Add support for blinds and enhance here
                               i:        i,
                               j:        j});
         } else {

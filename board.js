@@ -448,6 +448,8 @@ function mouseHandler() {
         var temp = board[Math.round(row)][Math.round(col)];
         board[Math.round(row)][Math.round(col)] = board[orbSelected.row][orbSelected.col];
         board[orbSelected.row][orbSelected.col] = temp;
+        board[Math.round(row)][Math.round(col)].blind1 = false;
+        board[orbSelected.row][orbSelected.col].blind1 = false;
         orbSelected = { row: Math.round(row), col: Math.round(col) };
         if (!moved) {
           moved = true;

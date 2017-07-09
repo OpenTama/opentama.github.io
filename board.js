@@ -142,7 +142,7 @@ function redraw() {
                        toDraw[orbSelected.row][orbSelected.col].trueY,
                        boardWidth / numInRow,
                        boardHeight / numInCol);
-    if (orbAssets[toDraw[orbSelected.row][orbSelected.col].enhanced){
+    if (toDraw[orbSelected.row][orbSelected.col].enhanced){
       renderer.drawImage(plusAsset,
                          toDraw[orbSelected.row][orbSelected.col].trueX,
                          toDraw[orbSelected.row][orbSelected.col].trueY,

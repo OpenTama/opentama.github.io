@@ -42,8 +42,14 @@ bgAssets[1].src = "assets/bg1.png";
 
 function rollOrb() {
   // TODO: adjusted skyfall rate
+  // Reserch skyfall rates, if 15% dark is 15/100 says dark orb spawns, or 1.15 weight on dark
+  // Also account for tricolor, no-RCV and similar skyfalls 
   return {
     color:   Math.floor(Math.random() * 6),
+    enhanced: false,
+    locked: false,
+    blind1: false, // Regular blind, slide orbs to reveal
+    blind2: 0, // Duration blind, cannot see orbs until timer is over
     matched: false,
     trueX:   null,
     trueY:   null,
@@ -137,12 +143,18 @@ function cascade(skyfall) {
       for(var i = numInCol-1; i > 0; i--) {
         if(board[i][j].color == -1 && board[i-1][j].color != -1) {
           board[i][j].color = board[i-1][j].color;
+          board[i][j].enhanced = board[i-1][j].enhanced;
+          board[i][j].locked = board[i-1][j].locked;
+          board[i][j].blind1 = board[i-1][j].blind1;
+          board[i][j].blind2 = board[i-1][j].blind2;
           board[i-1][j].color = -1;
           board[i][j].offset = 1;
           hasCascade = true;
         }
       }
-      if(board[0][j].color == -1 && skyfall) {
+      if(board[0][j].color == -1 && 
+	
+	) {
         board[0][j] = rollOrb();
         board[0][j].offset = 1;
         hasCascade = true;
@@ -180,6 +192,7 @@ function getMatches() {
 
   var combos = 0; // Not yet how many combos, but how many groups of three
   // TODO: support no-match-3 - how about orb unbinds?
+  // TODO: support unable to match attribute effect
   // Animation goes left to right, then bottom to top
   for (var i = numInCol - 1; i >= 0; i--) {
     for (var j = 0; j < numInRow; j++) {
@@ -258,13 +271,14 @@ function getMatches() {
   var idsInOrder = Array.from(comboIds).sort(function(a, b){return a-b});
   for (let comboId of idsInOrder) {
     var comboStats = {
-      att:   -1,
-      orbs:  0,
-      cross: false,
-      tpa:   false,
-      row:   false,
-      col:   false, // TODO
-      o51e:  false  // TODO
+      att:     -1,
+      orbs:    0,
+      enhance: 0,
+      cross:   false,
+      tpa:     false,
+      row:     false,
+      col:     false,
+      o51e:    false
     };
     for (var i = 0; i < numInCol; i++) {
       // check whether this row is solid
@@ -281,6 +295,8 @@ function getMatches() {
                 comboStats.cross = true;
             }
           }
+          if(board[i][j].enhanced)
+            comboStats.enhance += 1;
           comboStats.orbs += 1;
 	  animationList.push({timeLeft: 10,
                               type:     "erase",
@@ -295,12 +311,32 @@ function getMatches() {
         comboStats.row = true;
       }
     }
+    for (var j = 0; j < numInRow; j++) {
+      // check whether this row is solid
+      var isCol = true;
+      for (var i = 0; i < numInCol; i++) {
+        if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
+          // Nothing, this program deserves a break too.
+        } else {
+          isCol = false;
+        }
+      }
+      if (isCol) {
+        comboStats.col = true;
+      }
+    }
     if (comboStats.orbs == 4) {
       comboStats.tpa = true;
     }
     if (comboStats.orbs != 5) {
       comboStats.cross = false;
     }
+    if (comboStats.orbs == 5) {
+      if (comboStats.enhance > 0){
+        comboStats.o51e = true
+      }
+    }
+    // TODO add minOrbs functionality here, remove combo if less
     for (var i = 0; i < numInCol; i++) {
       for (var j = 0; j < numInRow; j++) {
         if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {

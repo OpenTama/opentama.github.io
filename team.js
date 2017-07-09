@@ -43,7 +43,9 @@ fetch("https://www.padherder.com/api/active_skills").then(function(response) {
 });
 
 function processLSkills(data) {
-  var missing = 0;var timeExtension = [
+  var missing = 0;
+  // TODO refactor
+  var timeExtension = [
     /(?:^|\. )Increases time limit of orb movement by ([0-9.]+) seconds(?:\.$|(?=\. )|$)/,
     function (reMatch) { return {type: "time_extension", time: parseFloat(reMatch[1]) }; }
   ];

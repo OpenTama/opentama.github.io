@@ -1,43 +1,26 @@
-var renderer;
+var getNumInRow;
+var getNumInCol;
+var getBoard;
+var initBoard;
+var boardMouseDown;
+var boardMouseUp;
+var boardMouseMove;
+var getTimeLeft;
+var getOrbSelected;
+
+(function() {
+
 var numInRow = 6;
 var numInCol = 5;
 var gameRules = {
   skyfall:  true,
   moveTime: 4,
-}
-var boardWidth = 600;
-var boardHeight = 500;
+};
 var board = [];
-var renderQueue = [];
-var animationList = [];
 var timeLeft = 0;
-var orbSelected = null;
-var animationRunning = false;
-var orbAssets = [
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image(),
-  new Image()
-];
-var bgAssets = [new Image(), new Image()];
-orbAssets[0].src = "assets/Orb-Fr.png";
-orbAssets[1].src = "assets/Orb-Wt.png";
-orbAssets[2].src = "assets/Orb-Wd.png";
-orbAssets[3].src = "assets/Orb-Lt.png";
-orbAssets[4].src = "assets/Orb-Dk.png";
-orbAssets[5].src = "assets/Orb-Heal.png";
-orbAssets[6].src = "assets/Orb-Jammer.png";
-orbAssets[7].src = "assets/Orb-Poison.png";
-orbAssets[8].src = "assets/Orb-MPoison.png";
-orbAssets[9].src = "assets/Orb-Bomb.png";
-bgAssets[0].src = "assets/bg0.png";
-bgAssets[1].src = "assets/bg1.png";
+var timeMoveStarted = new Date();
+var moved = false;
+var orbSelected;
 
 function rollOrb() {
   // TODO: adjusted skyfall rate
@@ -48,7 +31,7 @@ function rollOrb() {
     trueY:   null,
     offset:  0
   };
-}
+};
 
 function refreshBoard() {
   board = [];
@@ -59,73 +42,6 @@ function refreshBoard() {
       board[i][j] = rollOrb();
     }
   }
-};
-
-function redraw() {
-  // TODO variable frame rate
-  var toDraw = renderQueue.shift();
-  // Queue is empty when orbs are being moved
-  if (typeof(toDraw) == "undefined") {
-    animationRunning = false;
-    toDraw = board;
-  }
-  renderer.clearRect(0, 0, boardWidth, boardHeight);
-  for (var i = 0; i < numInCol; i++) {
-    for (var j = 0; j < numInRow; j++) {
-      // draw background
-      renderer.drawImage(bgAssets[(i + j) % 2],
-                         j * boardWidth / numInRow,
-                         i * boardHeight / numInCol,
-                         boardWidth / numInRow,
-                         boardHeight / numInCol);
-      // Orb id -1 means don't draw it
-      if (toDraw[i][j].color >= 0 && toDraw[i][j].color < orbAssets.length) {
-        if (orbSelected != null && orbSelected.row == i && orbSelected.col == j) {
-	  renderer.globalAlpha = 0.5;
-        }
-        renderer.drawImage(orbAssets[toDraw[i][j].color],
-                           boardWidth * j / numInRow,
-                           boardHeight * (i - toDraw[i][j].offset) / numInCol,
-                           boardWidth / numInRow,
-                           boardHeight / numInCol);
-        renderer.globalAlpha = 1;
-      }
-    }
-  }
-  if (orbSelected != null) {
-    renderer.drawImage(orbAssets[toDraw[orbSelected.row][orbSelected.col].color],
-                       toDraw[orbSelected.row][orbSelected.col].trueX,
-                       toDraw[orbSelected.row][orbSelected.col].trueY,
-		       boardWidth / numInRow,
-                       boardHeight / numInCol);
-    if (timeLeft < .5) {
-      renderer.fillStyle = "#00FF00"
-      renderer.fillRect(toDraw[orbSelected.row][orbSelected.col].trueX,
-                        toDraw[orbSelected.row][orbSelected.col].trueY - boardHeight / 50,
-                        boardWidth / numInRow * timeLeft * 2,
-                        boardHeight / 50);
-    }
-  }
-  for (var animation of animationList) {
-    animation.timeLeft -= 1;
-    if (animation.type == "pause") {
-      break;
-    }
-    switch (animation.type) {
-    case "erase":
-      renderer.globalAlpha = animation.timeLeft / 10;
-      renderer.drawImage(orbAssets[animation.color],
-                         boardWidth * animation.j / numInRow,
-                         boardHeight * animation.i / numInCol,
-                         boardWidth / numInRow,
-                         boardHeight / numInCol);
-      renderer.globalAlpha = 1; 
-      break;
-    }
-  }
-  animationList = animationList.filter(function(animation) {
-    return animation.timeLeft > 0;
-  });
 };
 
 function cascade(skyfall) {
@@ -150,20 +66,20 @@ function cascade(skyfall) {
     if (!hasCascade) {
       break;
     }
-    animationList.push({timeLeft: 3, type: "pause"});
+    pushAnimation({timeLeft: 3, type: "pause"});
     for (var x = 0; x < 3; x++) {
       for(var i = 0; i < numInCol; i++) {
         for(var j = 0; j < numInRow; j++) {
           board[i][j].offset = Math.max(board[i][j].offset - .34, 0);
         }
       }
-      renderQueue.push(JSON.parse(JSON.stringify(board)));
+      pushBoard(board);
     }
   }
   if (gameRules.skyfall || !skyfall) {
     getMatches();
   }
-}
+};
 
 function getMatches() {
   timeLeft = 0;
@@ -281,11 +197,11 @@ function getMatches() {
             }
           }
           comboStats.orbs += 1;
-	  animationList.push({timeLeft: 10,
-                              type:     "erase",
-                              color:    board[i][j].color,
-                              i:        i,
-                              j:        j});
+	  pushAnimation({timeLeft: 10,
+                         type:     "erase",
+                         color:    board[i][j].color,
+                         i:        i,
+                         j:        j});
         } else {
           isRow = false;
         }
@@ -308,9 +224,9 @@ function getMatches() {
       }
     }
     // Animate combo
-    animationList.push({timeLeft: 10, type: "pause"});
+    pushAnimation({timeLeft: 10, type: "pause"});
     for (var i = 0; i < 10; i++) {
-      renderQueue.push(JSON.parse(JSON.stringify(board)));
+      pushBoard(board);
     }
     comboList[comboList.length] = comboStats;
     useCombo(comboStats);
@@ -318,7 +234,7 @@ function getMatches() {
   if(comboList.length == 0) {
     if (!gameRules.skyfall) {
       for (var i = 0; i < 10; i++) {
-        renderQueue.push(JSON.parse(JSON.stringify(board)));
+        pushBoard(board);
       }
       cascade(true);
     }
@@ -326,74 +242,79 @@ function getMatches() {
   } else {
     cascade(gameRules.skyfall);
   }
-}
+};
 
-function mouseHandler() {
-  var timeMoveStarted = new Date();
-  // TODO: orb rotation
-  var moved = false;
-  document.getElementById("board").addEventListener("mousedown", function(e) {
-    if (animationRunning) {
-      return;
-    }
-    var col = Math.floor((e.pageX - this.offsetLeft)*1.0/boardWidth*numInRow);
-    var row = Math.floor((e.pageY - this.offsetTop)*1.0/boardHeight*numInCol);
-    orbSelected = { row: row, col: col };
-    board[orbSelected.row][orbSelected.col].trueX = e.pageX - this.offsetLeft - boardWidth / numInRow / 2;
-    board[orbSelected.row][orbSelected.col].trueY = e.pageY - this.offsetTop - boardHeight / numInCol / 2;
+boardMouseDown = function(row, col) {
+  orbSelected = { row: Math.round(row), col: Math.round(col) };
+  board[orbSelected.row][orbSelected.col].trueX = col;
+  board[orbSelected.row][orbSelected.col].trueY = row;
+  moved = false;
+  gameRules = getGameRules();
+};
+
+boardMouseUp = function(row, col) {
+  if (orbSelected == null) {
+    return;
+  }
+  board[orbSelected.row][orbSelected.col].trueX = null;
+  board[orbSelected.row][orbSelected.col].trueY = null;
+  orbSelected = null;
+  if (moved == true) {
     moved = false;
-  });
-  document.getElementById("board").addEventListener("mouseup", function(e) {
-    if (animationRunning || orbSelected == null) {
-      return;
+    getMatches();
+  }
+};
+
+boardMouseMove = function(row, col) {
+  if (orbSelected == null) {
+    return;
+  }
+  if (Math.round(col) != orbSelected.col || Math.round(row) != orbSelected.row) {
+    if (Math.sqrt(Math.pow(Math.round(col) - col, 2) + Math.pow(Math.round(row) - row, 2)) < .5) {
+      var temp = board[Math.round(row)][Math.round(col)];
+      board[Math.round(row)][Math.round(col)] = board[orbSelected.row][orbSelected.col];
+      board[orbSelected.row][orbSelected.col] = temp;
+      orbSelected = { row: Math.round(row), col: Math.round(col) };
+      if (!moved) {
+        moved = true;
+        timeMoveStarted = new Date();
+      }
     }
-    board[orbSelected.row][orbSelected.col].trueX = null;
-    board[orbSelected.row][orbSelected.col].trueY = null;
-    orbSelected = null;
-    if (moved == true) {
+  }
+  board[orbSelected.row][orbSelected.col].trueX = col;
+  board[orbSelected.row][orbSelected.col].trueY = row;
+};
+
+setInterval(function() {
+  if (moved) {
+    timeLeft = (gameRules.moveTime - (new Date() - timeMoveStarted) / 1000.) / gameRules.moveTime;
+    if (timeLeft <= 0) {
+      board[orbSelected.row][orbSelected.col].trueX = null;
+      board[orbSelected.row][orbSelected.col].trueY = null;
+      orbSelected = null;
       moved = false;
       getMatches();
     }
-  });
-  document.getElementById("board").addEventListener("mousemove", function(e) {
-    if (animationRunning || orbSelected == null) {
-      return;
-    }
-    var col = (e.pageX - this.offsetLeft) * 1.0 * numInRow / boardWidth - .5;
-    var row = (e.pageY - this.offsetTop) * 1.0 * numInCol / boardHeight - .5;
-    if (Math.round(col) != orbSelected.col || Math.round(row) != orbSelected.row) {
-      if (Math.sqrt(Math.pow(Math.round(col) - col, 2) + Math.pow(Math.round(row) - row, 2)) < .5) {
-        var temp = board[Math.round(row)][Math.round(col)];
-        board[Math.round(row)][Math.round(col)] = board[orbSelected.row][orbSelected.col];
-        board[orbSelected.row][orbSelected.col] = temp;
-        orbSelected = { row: Math.round(row), col: Math.round(col) };
-        if (!moved) {
-          moved = true;
-          timeMoveStarted = new Date();
-          gameRules = getGameRules();
-        }
-      }
-    }
-    board[orbSelected.row][orbSelected.col].trueX = e.pageX - this.offsetLeft - boardWidth / numInRow / 2;
-    board[orbSelected.row][orbSelected.col].trueY = e.pageY - this.offsetTop - boardHeight / numInCol / 2;
-  });
-  setInterval(function() {
-    if (moved) {
-      timeLeft = (gameRules.moveTime - (new Date() - timeMoveStarted) / 1000.) / gameRules.moveTime;
-      if (timeLeft <= 0) {
-        board[orbSelected.row][orbSelected.col].trueX = null;
-        board[orbSelected.row][orbSelected.col].trueY = null;
-        orbSelected = null;
-        moved = false;
-        getMatches();
-      }
-    }
-  }, 50);
-}
+  }
+}, 50);
 
-function init() {
-  renderer = document.getElementById("board").getContext("2d");
+getNumInRow = function() { return numInRow; };
+getNumInCol = function() { return numInCol; };
+
+getBoard = function() {
+  return JSON.parse(JSON.stringify(board));
+};
+
+initBoard = function() {
   refreshBoard();
-  setInterval(redraw, 50);
-  mouseHandler();
-}
+};
+
+getTimeLeft = function() {
+  return timeLeft;
+};
+
+getOrbSelected = function() {
+  return orbSelected;
+};
+
+})();

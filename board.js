@@ -68,11 +68,13 @@ function rollOrb() {
   // TODO: adjusted skyfall rate
   // Reserch skyfall rates, if 15% dark is 15/100 says dark orb spawns, or 1.15 weight on dark
   // Also account for tricolor, no-RCV and similar skyfalls 
+  var plus = Math.floor(Math.random() * 5) // 20% plus rate
+  var blind = Math.floor(Math.random() * 10) // 10% blind rate
   return {
     color:   Math.floor(Math.random() * 6),
-    enhanced: false,
+    enhanced: plus == 0,
     locked: false,
-    blind1: false, // Regular blind, slide orbs to reveal
+    blind1: blind == 0, // Regular blind, slide orbs to reveal
     blind2: 0, // Duration blind, cannot see orbs until timer is over
     matched: false,
     trueX:   null,

@@ -20,7 +20,7 @@ function getGameRules() {
 }
 
 // make sure it processes monster data after lskills and askills
-fetch("https://www.padherder.com/api/active_skills").then(function(response) {
+/*fetch("https://www.padherder.com/api/active_skills").then(function(response) {
   return response.json();
 }).then(function(data) {
   processASkills(data);
@@ -40,7 +40,7 @@ fetch("https://www.padherder.com/api/active_skills").then(function(response) {
   });
 }).catch(function() {
   alert("unable to read actives");
-});
+});*/
 
 function processLSkills(data) {
   var missing = 0;

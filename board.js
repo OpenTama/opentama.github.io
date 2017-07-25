@@ -26,7 +26,21 @@ var orbAssets = [
   new Image(),
   new Image()
 ];
+var blindAssets = [
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image()
+];
 var bgAssets = [new Image(), new Image()];
+var plusAsset = new Image();
+var lockAsset = new Image();
 orbAssets[0].src = "assets/Orb-Fr.png";
 orbAssets[1].src = "assets/Orb-Wt.png";
 orbAssets[2].src = "assets/Orb-Wd.png";
@@ -37,13 +51,31 @@ orbAssets[6].src = "assets/Orb-Jammer.png";
 orbAssets[7].src = "assets/Orb-Poison.png";
 orbAssets[8].src = "assets/Orb-MPoison.png";
 orbAssets[9].src = "assets/Orb-Bomb.png";
+blindAssets[0].src = "assets/Shadow-Orb.png";
+blindAssets[1].src = "assets/Shadow-Orb.png";
+blindAssets[2].src = "assets/Shadow-Orb.png";
+blindAssets[3].src = "assets/Shadow-Orb.png";
+blindAssets[4].src = "assets/Shadow-Orb.png";
+blindAssets[5].src = "assets/Shadow-Heal.png";
+blindAssets[6].src = "assets/Shadow-Jammer.png";
+blindAssets[7].src = "assets/Shadow-Poison.png";
+blindAssets[8].src = "assets/Shadow-MPoison.png";
+blindAssets[9].src = "assets/Shadow-Bomb.png";
 bgAssets[0].src = "assets/bg0.png";
 bgAssets[1].src = "assets/bg1.png";
+plusAsset.src = "assets/Mod-Plus.png";
+lockAsset.src = "assets/Mod-Lock.png";
 
 function rollOrb() {
   // TODO: adjusted skyfall rate
+  // Reserch skyfall rates, if 15% dark is 15/100 says dark orb spawns, or 1.15 weight on dark
+  // Also account for tricolor, no-RCV and similar skyfalls 
   return {
     color:   Math.floor(Math.random() * 6),
+    enhanced: false,
+    locked: false,
+    blind1: false, // Regular blind, slide orbs to reveal
+    blind2: 0, // Duration blind, cannot see orbs until timer is over
     matched: false,
     trueX:   null,
     trueY:   null,
@@ -82,13 +114,33 @@ function redraw() {
       // Orb id -1 means don't draw it
       if (toDraw[i][j].color >= 0 && toDraw[i][j].color < orbAssets.length) {
         if (orbSelected != null && orbSelected.row == i && orbSelected.col == j) {
-	  renderer.globalAlpha = 0.5;
-        }
-        renderer.drawImage(orbAssets[toDraw[i][j].color],
+	  renderer.globalAlpha = 0.5; // The selected orb should be transparent
+        }   
+        var orbImage = orbAssets[toDraw[i][j].color];
+        if (toDraw[i][j].blind2 > 0){ // Duration blind overrides normal blind
+          orbImage = blindAssets[toDraw[i][j].color]; // TODO: Create specific textures for duration blind
+        } else if (toDraw[i][j].blind1){
+          orbImage = blindAssets[toDraw[i][j].color]; 
+        } 
+        renderer.drawImage(orbImage,
                            boardWidth * j / numInRow,
                            boardHeight * (i - toDraw[i][j].offset) / numInCol,
                            boardWidth / numInRow,
                            boardHeight / numInCol);
+        if (toDraw[i][j].enhanced){
+          renderer.drawImage(plusAsset,
+                             boardWidth * j / numInRow,
+                             boardHeight * (i - toDraw[i][j].offset) / numInCol,
+                             boardWidth / numInRow,
+                             boardHeight / numInCol);
+        }
+        if (toDraw[i][j].locked){
+          renderer.drawImage(lockAsset,
+                             boardWidth * j / numInRow,
+                             boardHeight * (i - toDraw[i][j].offset) / numInCol,
+                             boardWidth / numInRow,
+                             boardHeight / numInCol);
+        }
         renderer.globalAlpha = 1;
       }
     }
@@ -97,8 +149,22 @@ function redraw() {
     renderer.drawImage(orbAssets[toDraw[orbSelected.row][orbSelected.col].color],
                        toDraw[orbSelected.row][orbSelected.col].trueX,
                        toDraw[orbSelected.row][orbSelected.col].trueY,
-		       boardWidth / numInRow,
+                       boardWidth / numInRow,
                        boardHeight / numInCol);
+    if (toDraw[orbSelected.row][orbSelected.col].enhanced){
+      renderer.drawImage(plusAsset,
+                         toDraw[orbSelected.row][orbSelected.col].trueX,
+                         toDraw[orbSelected.row][orbSelected.col].trueY,
+                         boardWidth / numInRow,
+                         boardHeight / numInCol);
+    }
+    if (toDraw[orbSelected.row][orbSelected.col].locked){
+      renderer.drawImage(lockAsset,
+                         toDraw[orbSelected.row][orbSelected.col].trueX,
+                         toDraw[orbSelected.row][orbSelected.col].trueY,
+                         boardWidth / numInRow,
+                         boardHeight / numInCol);
+    }
     if (timeLeft < .5) {
       renderer.fillStyle = "#00FF00"
       renderer.fillRect(toDraw[orbSelected.row][orbSelected.col].trueX,
@@ -137,6 +203,10 @@ function cascade(skyfall) {
       for(var i = numInCol-1; i > 0; i--) {
         if(board[i][j].color == -1 && board[i-1][j].color != -1) {
           board[i][j].color = board[i-1][j].color;
+          board[i][j].enhanced = board[i-1][j].enhanced;
+          board[i][j].locked = board[i-1][j].locked;
+          board[i][j].blind1 = board[i-1][j].blind1;
+          board[i][j].blind2 = board[i-1][j].blind2;
           board[i-1][j].color = -1;
           board[i][j].offset = 1;
           hasCascade = true;
@@ -180,6 +250,7 @@ function getMatches() {
 
   var combos = 0; // Not yet how many combos, but how many groups of three
   // TODO: support no-match-3 - how about orb unbinds?
+  // TODO: support unable to match attribute effect
   // Animation goes left to right, then bottom to top
   for (var i = numInCol - 1; i >= 0; i--) {
     for (var j = 0; j < numInRow; j++) {
@@ -258,13 +329,14 @@ function getMatches() {
   var idsInOrder = Array.from(comboIds).sort(function(a, b){return a-b});
   for (let comboId of idsInOrder) {
     var comboStats = {
-      att:   -1,
-      orbs:  0,
-      cross: false,
-      tpa:   false,
-      row:   false,
-      col:   false, // TODO
-      o51e:  false  // TODO
+      att:     -1,
+      orbs:    0,
+      enhance: 0,
+      cross:   false,
+      tpa:     false,
+      row:     false,
+      col:     false,
+      o51e:    false
     };
     for (var i = 0; i < numInCol; i++) {
       // check whether this row is solid
@@ -281,10 +353,13 @@ function getMatches() {
                 comboStats.cross = true;
             }
           }
+          if (board[i][j].enhanced) {
+            comboStats.enhance += 1;
+          }
           comboStats.orbs += 1;
-	  animationList.push({timeLeft: 10,
+          animationList.push({timeLeft: 10,
                               type:     "erase",
-                              color:    board[i][j].color,
+                              color:    board[i][j].color, // TODO: Add support for blinds, locks and enhance here
                               i:        i,
                               j:        j});
         } else {
@@ -295,12 +370,28 @@ function getMatches() {
         comboStats.row = true;
       }
     }
+    for (var j = 0; j < numInRow; j++) {
+      // check whether this row is solid
+      var isCol = true;
+      for (var i = 0; i < numInCol; i++) {
+        if (!boardMask[i][j].matched || boardMask[i][j].comboId != comboId) {
+          isCol = false;
+        }
+      }
+      if (isCol) {
+        comboStats.col = true;
+      }
+    }
     if (comboStats.orbs == 4) {
       comboStats.tpa = true;
     }
     if (comboStats.orbs != 5) {
       comboStats.cross = false;
     }
+    if (comboStats.orbs == 5 && comboStats.enhance > 0){
+      comboStats.o51e = true;
+    }
+    // TODO add minOrbs functionality here, remove combo if less
     for (var i = 0; i < numInCol; i++) {
       for (var j = 0; j < numInRow; j++) {
         if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
@@ -367,6 +458,8 @@ function mouseHandler() {
         var temp = board[Math.round(row)][Math.round(col)];
         board[Math.round(row)][Math.round(col)] = board[orbSelected.row][orbSelected.col];
         board[orbSelected.row][orbSelected.col] = temp;
+        board[Math.round(row)][Math.round(col)].blind1 = false;
+        board[orbSelected.row][orbSelected.col].blind1 = false;
         orbSelected = { row: Math.round(row), col: Math.round(col) };
         if (!moved) {
           moved = true;

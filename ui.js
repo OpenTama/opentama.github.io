@@ -16,6 +16,20 @@ var orbAssets = [
   new Image(),
   new Image()
 ];
+var blindAssets = [
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image(),
+  new Image()
+];
+var plusAsset = new Image();
+var lockAsset = new Image();
 var teamAssets = [
   new Image(),
   new Image(),
@@ -44,8 +58,20 @@ orbAssets[6].src = "assets/Orb-Jammer.png";
 orbAssets[7].src = "assets/Orb-Poison.png";
 orbAssets[8].src = "assets/Orb-MPoison.png";
 orbAssets[9].src = "assets/Orb-Bomb.png";
+blindAssets[0].src = "assets/Shadow-Orb.png";
+blindAssets[1].src = "assets/Shadow-Orb.png";
+blindAssets[2].src = "assets/Shadow-Orb.png";
+blindAssets[3].src = "assets/Shadow-Orb.png";
+blindAssets[4].src = "assets/Shadow-Orb.png";
+blindAssets[5].src = "assets/Shadow-Heal.png";
+blindAssets[6].src = "assets/Shadow-Jammer.png";
+blindAssets[7].src = "assets/Shadow-Poison.png";
+blindAssets[8].src = "assets/Shadow-MPoison.png";
+blindAssets[9].src = "assets/Shadow-Bomb.png";
 bgAssets[0].src = "assets/bg0.png";
 bgAssets[1].src = "assets/bg1.png";
+plusAsset.src = "assets/Mod-Plus.png";
+lockAsset.src = "assets/Mod-Lock.png";
 var renderer;
 var boardWidth = 600;
 var topHeight = 400;
@@ -98,13 +124,33 @@ function redraw() {
         // Orb id -1 means don't draw it
         if (toDraw[i][j].color >= 0 && toDraw[i][j].color < orbAssets.length) {
           if (getOrbSelected() != null && getOrbSelected().row == i && getOrbSelected().col == j) {
-            renderer.globalAlpha = 0.5;
+            renderer.globalAlpha = 0.5; // The selected orb should be transparent
           }
-          renderer.drawImage(orbAssets[toDraw[i][j].color],
+          var orbImage = orbAssets[toDraw[i][j].color];
+          if (toDraw[i][j].blind2 > 0){ // Duration blind overrides normal blind
+            orbImage = blindAssets[toDraw[i][j].color]; // TODO: Create specific textures for duration blind
+          } else if (toDraw[i][j].blind1){
+            orbImage = blindAssets[toDraw[i][j].color]; 
+          } 
+          renderer.drawImage(orbImage,
                              boardWidth * j / getNumInRow(),
                              boardHeight * (i - toDraw[i][j].offset) / getNumInCol() + topHeight,
                              boardWidth / getNumInRow(),
                              boardHeight / getNumInCol());
+          if (toDraw[i][j].enhanced) {
+            renderer.drawImage(plusAsset,
+                               boardWidth * j / getNumInRow(),
+                               boardHeight * (i - toDraw[i][j].offset) / getNumInCol() + topHeight,
+                               boardWidth / getNumInRow(),
+                               boardHeight / getNumInCol());
+          }
+          if (toDraw[i][j].locked) {
+            renderer.drawImage(lockAsset,
+                               boardWidth * j / getNumInRow(),
+                               boardHeight * (i - toDraw[i][j].offset) / getNumInCol() + topHeight,
+                               boardWidth / getNumInRow(),
+                               boardHeight / getNumInCol());
+          }
           renderer.globalAlpha = 1;
         }
       }
@@ -115,6 +161,20 @@ function redraw() {
                          boardHeight * toDraw[getOrbSelected().row][getOrbSelected().col].trueY / getNumInCol() + topHeight,
                          boardWidth / getNumInRow(),
                          boardHeight / getNumInCol());
+      if (toDraw[getOrbSelected().row][getOrbSelected().col].enhanced) {
+        renderer.drawImage(plusAsset,
+                           boardWidth * toDraw[getOrbSelected().row][getOrbSelected().col].trueX / getNumInRow(),
+                           boardHeight * toDraw[getOrbSelected().row][getOrbSelected().col].trueY / getNumInCol() + topHeight,
+                           boardWidth / getNumInRow(),
+                           boardHeight / getNumInCol());
+      }
+      if (toDraw[getOrbSelected().row][getOrbSelected().col].locked) {
+        renderer.drawImage(lockAsset,
+                           boardWidth * toDraw[getOrbSelected().row][getOrbSelected().col].trueX / getNumInRow(),
+                           boardHeight * toDraw[getOrbSelected().row][getOrbSelected().col].trueY / getNumInCol() + topHeight,
+                           boardWidth / getNumInRow(),
+                           boardHeight / getNumInCol());
+      }
       if (getTimeLeft() < .5) {
         renderer.fillStyle = "#00FF00"
         renderer.fillRect(boardWidth * toDraw[getOrbSelected().row][getOrbSelected().col].trueX / getNumInRow(),
@@ -174,6 +234,7 @@ function redraw() {
     renderer.fillStyle = "#444499";
     renderer.fillRect(boardWidth * 0.2, (boardHeight + topHeight) * 0.4, boardWidth * 0.6, (boardHeight + topHeight) * 0.2);
     renderer.fillStyle = "#333333";
+    renderer.textAlign = "center";
     renderer.fillText("LEAVE DUNGEON?", boardWidth / 2, (boardHeight + topHeight) / 2);
   }
   if (scene == 1) {

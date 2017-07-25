@@ -357,7 +357,7 @@ function getMatches() {
             comboStats.enhance += 1;
           }
           comboStats.orbs += 1;
-	  animationList.push({timeLeft: 10,
+          animationList.push({timeLeft: 10,
                               type:     "erase",
                               color:    board[i][j].color, // TODO: Add support for blinds, locks and enhance here
                               i:        i,
@@ -374,9 +374,7 @@ function getMatches() {
       // check whether this row is solid
       var isCol = true;
       for (var i = 0; i < numInCol; i++) {
-        if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
-          // Nothing, this program deserves a break too.
-        } else {
+        if (!boardMask[i][j].matched || boardMask[i][j].comboId != comboId) {
           isCol = false;
         }
       }
@@ -390,10 +388,8 @@ function getMatches() {
     if (comboStats.orbs != 5) {
       comboStats.cross = false;
     }
-    if (comboStats.orbs == 5) {
-      if (comboStats.enhance > 0){
-        comboStats.o51e = true
-      }
+    if (comboStats.orbs == 5 && comboStats.enhance > 0){
+      comboStats.o51e = true;
     }
     // TODO add minOrbs functionality here, remove combo if less
     for (var i = 0; i < numInCol; i++) {

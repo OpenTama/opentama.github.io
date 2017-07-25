@@ -20,7 +20,7 @@ var board = [];
 var timeLeft = 0;
 var timeMoveStarted = new Date();
 var moved = false;
-var orbSelected;
+var orbSelected = null;
 
 function rollOrb() {
   // TODO: adjusted skyfall rate

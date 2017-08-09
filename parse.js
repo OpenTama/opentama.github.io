@@ -2,7 +2,7 @@ lskills = [];
 askills = [];
 
 // make sure it processes monster data after lskills and askills
-/*fetch("https://www.padherder.com/api/active_skills").then(function(response) {
+fetch("https://www.padherder.com/api/active_skills").then(function(response) {
   return response.json();
 }).then(function(data) {
   processASkills(data);
@@ -22,7 +22,7 @@ askills = [];
   });
 }).catch(function() {
   alert("unable to read actives");
-});*/
+});
 
 function processLSkills(data) {
   var missing = 0;
@@ -411,11 +411,15 @@ function processMonsters(data) {
     monsters[monster.id] = {askill:     askills[monster.active_skill],
                             lskill:     lskills[monster.leader_skill],
                             name:       monster.name,
+                            id:         monster.id,
+                            assetId:    typeof(monster.pdx_id) == "undefined" ? monster.id : monster.pdx_id,
                             atk:        monster.atk_max + 495,
                             hp:         monster.hp_max + 990,
                             rcv:        monster.rcv_max + 297,
                             awakenings: monster.awoken_skills,
+                            rarity:     monster.rarity,
                             att:        [monster.element, monster.element2],
-                            type:       [monster.type, monster.type2]};
+                            type:       [monster.type, monster.type2, monster.type3]};
   }
+  console.log("data loaded")
 }

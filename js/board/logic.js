@@ -87,6 +87,10 @@ function cascade(skyfall) {
       pushBoard(board);
     }
   }
+  pushAnimation({timeLeft: 8, type: "pause"});
+  for (var i = 0; i < 8; i++) {
+    pushBoard(board);
+  }
   if (gameRules.skyfall || !skyfall) {
     getMatches();
   }
@@ -94,7 +98,6 @@ function cascade(skyfall) {
 
 function getMatches() {
   timeLeft = 0;
-  animationRunning = true;
   // keep track of what combo an orb is part of
   var boardMask = [];
   for (var i = 0; i < numInCol; i++) {
@@ -264,13 +267,10 @@ function getMatches() {
     useCombo(comboStats);
   }
   if(comboList.length == 0) {
+    endCombos();
     if (!gameRules.skyfall) {
-      for (var i = 0; i < 10; i++) {
-        pushBoard(board);
-      }
       cascade(true);
     }
-    endCombos();
   } else {
     cascade(gameRules.skyfall);
   }
@@ -284,39 +284,37 @@ boardMouseDown = function(row, col) {
   gameRules = getGameRules();
 };
 
-boardMouseUp = function(row, col) {
-  if (orbSelected == null) {
-    return;
-  }
-  board[orbSelected.row][orbSelected.col].trueX = null;
-  board[orbSelected.row][orbSelected.col].trueY = null;
-  orbSelected = null;
-  if (moved == true) {
-    moved = false;
-    getMatches();
+boardMouseUp = function() {
+  if (orbSelected != null) {
+    board[orbSelected.row][orbSelected.col].trueX = null;
+    board[orbSelected.row][orbSelected.col].trueY = null;
+    orbSelected = null;
+    if (moved == true) {
+      moved = false;
+      getMatches();
+    }
   }
 };
 
 boardMouseMove = function(row, col) {
-  if (orbSelected == null) {
-    return;
-  }
-  if (Math.round(col) != orbSelected.col || Math.round(row) != orbSelected.row) {
-    if (Math.sqrt(Math.pow(Math.round(col) - col, 2) + Math.pow(Math.round(row) - row, 2)) < .5) {
-      var temp = board[Math.round(row)][Math.round(col)];
-      board[Math.round(row)][Math.round(col)] = board[orbSelected.row][orbSelected.col];
-      board[orbSelected.row][orbSelected.col] = temp;
-      board[Math.round(row)][Math.round(col)].blind1 = false;
-      board[orbSelected.row][orbSelected.col].blind1 = false;
-      orbSelected = { row: Math.round(row), col: Math.round(col) };
-      if (!moved) {
-        moved = true;
-        timeMoveStarted = new Date();
+  if (orbSelected != null) {
+    if (Math.round(col) != orbSelected.col || Math.round(row) != orbSelected.row) {
+      if (Math.sqrt(Math.pow(Math.round(col) - col, 2) + Math.pow(Math.round(row) - row, 2)) < .5) {
+        var temp = board[Math.round(row)][Math.round(col)];
+        board[Math.round(row)][Math.round(col)] = board[orbSelected.row][orbSelected.col];
+        board[orbSelected.row][orbSelected.col] = temp;
+        board[Math.round(row)][Math.round(col)].blind1 = false;
+        board[orbSelected.row][orbSelected.col].blind1 = false;
+        orbSelected = { row: Math.round(row), col: Math.round(col) };
+        if (!moved) {
+          moved = true;
+          timeMoveStarted = new Date();
+        }
       }
     }
+    board[orbSelected.row][orbSelected.col].trueX = col;
+    board[orbSelected.row][orbSelected.col].trueY = row;
   }
-  board[orbSelected.row][orbSelected.col].trueX = col;
-  board[orbSelected.row][orbSelected.col].trueY = row;
 };
 
 setInterval(function() {

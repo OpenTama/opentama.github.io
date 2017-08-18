@@ -1,26 +1,41 @@
-lskills = [];
-askills = [];
+var getMonsters;
+
+(function(){
+
+var monsters = [];
+var lskills = [];
+var askills = [];
+monsters[0] = {
+  id:      0,
+  assetId: 0,
+  rarity:  -1,
+  att:     [-1, -1],
+  type:    [-1, -1, -1]
+};
 
 // make sure it processes monster data after lskills and askills
-fetch("https://www.padherder.com/api/active_skills").then(function(response) {
+fetch("data/active_skills").then(function(response) {
   return response.json();
 }).then(function(data) {
   processASkills(data);
-  fetch("https://www.padherder.com/api/leader_skills").then(function(response) {
+  fetch("data/leader_skills").then(function(response) {
     return response.json();
   }).then(function(data) {
     processLSkills(data);
-    fetch("https://www.padherder.com/api/monsters").then(function(response) {
+    fetch("data/monsters").then(function(response) {
       return response.json();
     }).then(function(data) {
       processMonsters(data);
-    }).catch(function() {
+    }).catch(function(e) {
+      console.error(e);
       alert("unable to read monsters");
     });
-  }).catch(function() {
+  }).catch(function(e) {
+    console.error(e);
     alert("unable to read leaders");
   });
-}).catch(function() {
+}).catch(function(e) {
+  console.error(e);
   alert("unable to read actives");
 });
 
@@ -423,3 +438,7 @@ function processMonsters(data) {
   }
   console.log("data loaded")
 }
+
+getMonsters = function() { return monsters; }
+
+})()

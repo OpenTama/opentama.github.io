@@ -24,7 +24,7 @@ function redraw(renderer) {
 
 drawTeam = function(renderer, y, assists) {
   for (var i = assists ? 0 : 6; i < (assists ? 6 : 12); i++) {
-    var desiredSrc = "http://puzzledragonx.com/en/img/book/" + team[i].assetId + ".png";
+    var desiredSrc = "http://puzzledragonx.com/en/img/book/" + getTeam()[i].assetId + ".png";
     if (teamAssets[i].src != desiredSrc) {
       teamAssets[i].src = desiredSrc;
     }

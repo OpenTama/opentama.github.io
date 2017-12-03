@@ -9,7 +9,7 @@ var getFallbackSrc;
 var pushAnimation;
 var registerAnimation;
 var animationRunning;
-var deltaT = 0.051;
+var deltaT = 0.021;
 
 (function() {
 

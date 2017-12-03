@@ -11,12 +11,12 @@ var getOrbSelected;
 (function() {
 // TODO break up long functions here
 
-var numInRow = 6;
-var numInCol = 5;
 var gameRules = {
   skyfall:  true,
   moveTime: 4,
-  minOrbs: 3,
+  minOrbs:  3,
+  numInRow: 6,
+  numInCol: 5,
 };
 var board = [];
 var timeLeft = 0;
@@ -43,10 +43,11 @@ function rollOrb() {
 };
 
 function refreshBoard() {
+  gameRules = getGameRules();
   board = [];
-  for(var i = 0; i < numInCol; i++) {
+  for(var i = 0; i < gameRules.numInCol; i++) {
   board[i] = [];
-    for(var j = 0; j < numInRow; j++) {
+    for(var j = 0; j < gameRules.numInRow; j++) {
       // TODO: actual skyfall stuff, no available combos
       board[i][j] = rollOrb();
     }
@@ -54,11 +55,11 @@ function refreshBoard() {
 };
 
 function cascade(skyfall) {
-  for(var n = 0; n < numInCol; n++) {
+  for(var n = 0; n < gameRules.numInCol; n++) {
     var hasCascade = false;
-    for(var j = 0; j < numInRow; j++) {
+    for(var j = 0; j < gameRules.numInRow; j++) {
       // must loop from bottom to top
-      for(var i = numInCol-1; i > 0; i--) {
+      for(var i = gameRules.numInCol-1; i > 0; i--) {
         if(board[i][j].color == -1 && board[i-1][j].color != -1) {
           board[i][j].color = board[i-1][j].color;
           board[i][j].enhanced = board[i-1][j].enhanced;
@@ -79,19 +80,15 @@ function cascade(skyfall) {
     if (!hasCascade) {
       break;
     }
-    pushAnimation({timeLeft: 0.15, type: "pause"});
-    for (var x = 0; x < 0.15 / deltaT; x++) {
-      for(var i = 0; i < numInCol; i++) {
-        for(var j = 0; j < numInRow; j++) {
-          board[i][j].offset = Math.max(board[i][j].offset - .34, 0);
+    pushAnimation({timeLeft: 0.25, type: "pause"});
+    for (var x = 0; x < 0.25 / deltaT; x++) {
+      for(var i = 0; i < gameRules.numInCol; i++) {
+        for(var j = 0; j < gameRules.numInRow; j++) {
+          board[i][j].offset = Math.max(board[i][j].offset - 4 * deltaT, 0);
         }
       }
       pushBoard(board);
     }
-  }
-  pushAnimation({timeLeft: 0.4, type: "pause"});
-  for (var i = 0; i < 0.4 / deltaT; i++) {
-    pushBoard(board);
   }
   if (gameRules.skyfall || !skyfall) {
     getMatches();
@@ -102,9 +99,9 @@ function getMatches() {
   timeLeft = 0;
   // keep track of what combo an orb is part of
   var boardMask = [];
-  for (var i = 0; i < numInCol; i++) {
+  for (var i = 0; i < gameRules.numInCol; i++) {
     boardMask[i] = [];
-    for (var j = 0; j < numInRow; j++) {
+    for (var j = 0; j < gameRules.numInRow; j++) {
       boardMask[i][j] = { matched: false, comboId: 0 };
     }
   }
@@ -113,14 +110,14 @@ function getMatches() {
   // TODO: support no-match-3 - how about orb unbinds?
   // TODO: support unable to match attribute effect
   // Animation goes left to right, then bottom to top
-  for (var i = numInCol - 1; i >= 0; i--) {
-    for (var j = 0; j < numInRow; j++) {
+  for (var i = gameRules.numInCol - 1; i >= 0; i--) {
+    for (var j = 0; j < gameRules.numInRow; j++) {
       // color is -1 after cascade when skyfall is disabled
       if (board[i][j].color == -1) {
         continue;
       }
       // check vertical combos, but not in bottom 2 rows
-      if (i < numInCol - 2) {
+      if (i < gameRules.numInCol - 2) {
         if (board[i][j].color == board[i+1][j].color && board[i][j].color == board[i+2][j].color) {
           boardMask[i][j].matched = true;
           boardMask[i][j].comboId = combos;
@@ -132,7 +129,7 @@ function getMatches() {
         }
       }
       // check horizontal combos, but not in right 2 cols
-      if (j < numInRow - 2) {
+      if (j < gameRules.numInRow - 2) {
         if (board[i][j].color == board[i][j+1].color && board[i][j].color == board[i][j+2].color) {
           boardMask[i][j].matched = true;
           boardMask[i][j].comboId = combos;
@@ -148,15 +145,15 @@ function getMatches() {
   // Method to merge two overlapping combos
   function combine(id1, id2) {
     if (id1 != id2) {
-      for (var i = 0; i < numInCol; i++) {
-        for (var j = 0; j < numInRow; j++) {
+      for (var i = 0; i < gameRules.numInCol; i++) {
+        for (var j = 0; j < gameRules.numInRow; j++) {
           if (boardMask[i][j].comboId == id2) boardMask[i][j].comboId = id1;
         }
       }
     }
   }
-  for (var i = numInCol - 1; i >= 0; i--) {
-    for (var j = 0; j < numInRow; j++) {
+  for (var i = gameRules.numInCol - 1; i >= 0; i--) {
+    for (var j = 0; j < gameRules.numInRow; j++) {
       if (boardMask[i][j].matched) {
         // Check each adjacent orb to see if it is matched and of the same color
         if (i > 0 && board[i][j].color == board[i-1][j].color && boardMask[i-1][j].matched) {
@@ -165,10 +162,10 @@ function getMatches() {
         if (j > 0 && board[i][j].color == board[i][j-1].color && boardMask[i][j-1].matched) {
           combine(boardMask[i][j].comboId, boardMask[i][j-1].comboId);
         }
-        if (i < numInCol - 1 && board[i][j].color == board[i+1][j].color && boardMask[i+1][j].matched) {
+        if (i < gameRules.numInCol - 1 && board[i][j].color == board[i+1][j].color && boardMask[i+1][j].matched) {
           combine(boardMask[i][j].comboId, boardMask[i+1][j].comboId);
         }
-        if (j < numInRow - 1 && board[i][j].color == board[i][j+1].color && boardMask[i][j+1].matched) {
+        if (j < gameRules.numInRow - 1 && board[i][j].color == board[i][j+1].color && boardMask[i][j+1].matched) {
           combine(boardMask[i][j].comboId, boardMask[i][j+1].comboId);
         }
       }
@@ -176,8 +173,8 @@ function getMatches() {
   }
   // Add each remaining combo id to this list
   var comboIds = new Set([]);
-  for (var i = 0; i < numInCol; i++) {
-    for (var j = 0; j < numInRow; j++) {
+  for (var i = 0; i < gameRules.numInCol; i++) {
+    for (var j = 0; j < gameRules.numInRow; j++) {
       if (boardMask[i][j].matched) {
         comboIds.add(boardMask[i][j].comboId);
       }
@@ -200,14 +197,14 @@ function getMatches() {
       o51e:    false,
       box:     false, // TODO
     };
-    for (var i = 0; i < numInCol; i++) {
+    for (var i = 0; i < gameRules.numInCol; i++) {
       // check whether this row is solid
       var isRow = true;
-      for (var j = 0; j < numInRow; j++) {
+      for (var j = 0; j < gameRules.numInRow; j++) {
         if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
           comboStats.att = board[i][j].color;
           // get whether it is part of a cross. Still need to check that size == 5 later
-          if (i > 0 && i < numInCol - 1 && j > 0 && j < numInRow - 1) {
+          if (i > 0 && i < gameRules.numInCol - 1 && j > 0 && j < gameRules.numInRow - 1) {
             if (board[i+1][j].color == board[i][j].color &&
                 board[i-1][j].color == board[i][j].color &&
                 board[i][j+1].color == board[i][j].color &&
@@ -227,10 +224,10 @@ function getMatches() {
         comboStats.row = true;
       }
     }
-    for (var j = 0; j < numInRow; j++) {
+    for (var j = 0; j < gameRules.numInRow; j++) {
       // check whether this row is solid
       var isCol = true;
-      for (var i = 0; i < numInCol; i++) {
+      for (var i = 0; i < gameRules.numInCol; i++) {
         if (!boardMask[i][j].matched || boardMask[i][j].comboId != comboId) {
           isCol = false;
         }
@@ -250,8 +247,8 @@ function getMatches() {
     }
     // TODO add minOrbs functionality here, remove combo if less
     if (comboStats.orbs >= gameRules.minMatch) {
-      for (var i = 0; i < numInCol; i++) {
-        for (var j = 0; j < numInRow; j++) {
+      for (var i = 0; i < gameRules.numInCol; i++) {
+        for (var j = 0; j < gameRules.numInRow; j++) {
           if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
             pushAnimation({timeLeft: 0.5,
                            type:     "erase",
@@ -336,8 +333,8 @@ setInterval(function() {
   }
 }, deltaT * 1000);
 
-getNumInRow = function() { return numInRow; };
-getNumInCol = function() { return numInCol; };
+getNumInRow = function() { return gameRules.numInRow; };
+getNumInCol = function() { return gameRules.numInCol; };
 
 getBoard = function() {
   return JSON.parse(JSON.stringify(board));

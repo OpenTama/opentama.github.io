@@ -121,7 +121,7 @@ function processLSkills(data) {
 
   var ignore = [".+coins.+|Fusing.+|.+egg.+|.+exp.+|.+sound.+|.+Skill.+|.+skill.+|Sells.+|.+Latent.+"];
 
-  var mechanics = [[s4, "4 seconds"], [statReduce, "stat reduce"], [skillUse, "skill use"], [timeExtension, "time extenstion"],
+  var mechanics = [[s4, "4 seconds"], [statReduce, "stat reduce"], [skillUse, "skill use"], [timeExtension, "time extension"],
                    [o51e, "5o1e"], [colorShield, "color shield"], [base, "passive boost"], [hprange, "hp conditional"],
                    [blob, "blob"], [rainbow, "raindow"], [teammate, "required teammate"], [resolve, "resolve"], [noSkyfall, "no skyfall"],
                    [combo, "combo"], [counterAtk, "counterattack"], [autoRcv, "autorecover"], [autoAtk, "autoattack"], [cross, "cross"],

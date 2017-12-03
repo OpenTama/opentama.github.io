@@ -66,7 +66,7 @@ addScene("team/dash", {
   mousedown: mousedown,
   mousemove: function(e) {},
   mouseup:   function(e) {},
-  left:      {text: "Dungeon", scene: "board", action: function(){}},
+  left:      {text: "Dungeon", scene: "board", action: initBoard},
   right:     {text: "Team", scene: "team/dash", action: function(){}},
 });
 

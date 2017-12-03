@@ -20,6 +20,10 @@ function redraw(renderer) {
   drawTeam(renderer, getBoardWidth() * 0.15, true);
   renderer.fillText("TEAM:", getBoardWidth() * 0.025, getBoardWidth() * 0.4);
   drawTeam(renderer, getBoardWidth() * 0.45, false);
+  renderer.fillStyle = "#444499";
+  renderer.font = (getBoardWidth() * 0.03) + "px Sans";
+  drawLSkill(renderer, getBoardWidth() * 0.025, getTopHeight() + getBoardHeight() * 0.4, getBoardWidth() * 0.05,
+             getTeam()[6].lskill, getTeam()[11].lskill);
 };
 
 drawTeam = function(renderer, y, assists) {
@@ -29,6 +33,16 @@ drawTeam = function(renderer, y, assists) {
       teamAssets[i].src = desiredSrc;
     }
     renderer.drawImage(teamAssets[i], getBoardWidth() * ((i % 6) + 0.05) / 6, y, getBoardWidth() * 0.9 / 6, getBoardWidth() * 0.9 / 6);
+  }
+}
+
+function drawLSkill(renderer, x, y, dy, ls1, ls2) {
+  function LSToText (ls) {
+    return JSON.stringify(ls).match(/.{1,50}/g).join("\n    ");
+  }
+  strings = ls1.map(LSToText).concat([""]).concat(ls2.map(LSToText)).join("\n").split("\n");
+  for (var i in strings) {
+    renderer.fillText(strings[i], x, y + i * dy);
   }
 }
 

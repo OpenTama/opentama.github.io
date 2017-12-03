@@ -34,9 +34,30 @@ endCombos = function() {
 }
 
 getGameRules = function() {
+  skyfall = true;
+  board7x6 = false;
+  moveTime = 4;
+  minMatch = 3;
+  for (var component of team[6].lskill.concat(team[11].lskill)) {
+    switch (component.type) {
+      case "time extension":
+        moveTime += component.time;
+        break;
+      case "no skyfall":
+        skyfall = false;
+        break;
+      case "7x6":
+        board7x6 = true;
+        break;
+      case "no match n":
+        minMatch = Math.max(component.orbs + 1, minMatch);
+    }
+  }
   return {
-    skyfall:  false,
-    moveTime: 4,
+    skyfall:  skyfall,
+    moveTime: moveTime,
+    board7x6: board7x6,
+    minMatch: minMatch,
   }
 }
 

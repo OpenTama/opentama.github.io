@@ -7,6 +7,7 @@ var lskills = [];
 var askills = [];
 monsters[0] = {
   id:      0,
+  lskill:  [{type: "none"}],
   assetId: 0,
   rarity:  -1,
   att:     [-1, -1],
@@ -120,10 +121,12 @@ function processLSkills(data) {
 
   var ignore = [".+coins.+|Fusing.+|.+egg.+|.+exp.+|.+sound.+|.+Skill.+|.+skill.+|Sells.+|.+Latent.+"];
 
-  var mechanics = [s4, statReduce, skillUse, timeExtension, o51e, colorShield, base, hprange, blob, rainbow,
-                   teammate, resolve, noSkyfall, combo, counterAtk, autoRcv, autoAtk,
-                   cross, colorCombo, board7x6, noMatchN, leftover, ignore];
-  mechanics = mechanics.map(function(x) { return fromResList(x, "TODO"); });
+  var mechanics = [[s4, "4 seconds"], [statReduce, "stat reduce"], [skillUse, "skill use"], [timeExtension, "time extenstion"],
+                   [o51e, "5o1e"], [colorShield, "color shield"], [base, "passive boost"], [hprange, "hp conditional"],
+                   [blob, "blob"], [rainbow, "raindow"], [teammate, "required teammate"], [resolve, "resolve"], [noSkyfall, "no skyfall"],
+                   [combo, "combo"], [counterAtk, "counterattack"], [autoRcv, "autorecover"], [autoAtk, "autoattack"], [cross, "cross"],
+                   [colorCombo, "monocolor"], [board7x6, "7x6"], [noMatchN, "no match n"], [leftover, "leftover orbs"], [ignore, "none"]];
+  mechanics = mechanics.map(function(x) { return fromResList(x[0], x[1]); });
 
   for (var skill of data) {
     if (skill.name == "N/A") {
@@ -155,8 +158,7 @@ function processLSkills(data) {
     if (skill.effect != "") {
       console.log(skill.effect);
       missing += 1;
-      lskills[skill.name] = "Unsupported";
-      console.log(readableSkill);
+      lskills[skill.name] = [{type: "Unsupported or malformed"}];
     } else {
       lskills[skill.name] = readableSkill;
     }

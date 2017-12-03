@@ -21,7 +21,6 @@ function fromResList(resList, name) {
   var entireRe;
   try {
     entireRe = new RegExp(entireReStr);
-    console.log(entireRe);
   } catch (e) {
     console.error(e);
     console.error(entireReStr);

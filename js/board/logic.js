@@ -9,6 +9,7 @@ var getTimeLeft;
 var getOrbSelected;
 
 (function() {
+// TODO break up long functions here
 
 var numInRow = 6;
 var numInCol = 5;
@@ -27,6 +28,7 @@ function rollOrb() {
   // TODO: adjusted skyfall rate
   // Reserch skyfall rates, if 15% dark is 15/100 says dark orb spawns, or 1.15 weight on dark
   // Also account for tricolor, no-RCV and similar skyfalls 
+  // TODO cloud blind
   return {
     color:    Math.floor(Math.random() * 6),
     enhanced: false,
@@ -77,8 +79,8 @@ function cascade(skyfall) {
     if (!hasCascade) {
       break;
     }
-    pushAnimation({timeLeft: 3, type: "pause"});
-    for (var x = 0; x < 3; x++) {
+    pushAnimation({timeLeft: 0.15, type: "pause"});
+    for (var x = 0; x < 0.15 / deltaT; x++) {
       for(var i = 0; i < numInCol; i++) {
         for(var j = 0; j < numInRow; j++) {
           board[i][j].offset = Math.max(board[i][j].offset - .34, 0);
@@ -87,8 +89,8 @@ function cascade(skyfall) {
       pushBoard(board);
     }
   }
-  pushAnimation({timeLeft: 8, type: "pause"});
-  for (var i = 0; i < 8; i++) {
+  pushAnimation({timeLeft: 0.4, type: "pause"});
+  for (var i = 0; i < 0.4 / deltaT; i++) {
     pushBoard(board);
   }
   if (gameRules.skyfall || !skyfall) {
@@ -195,7 +197,8 @@ function getMatches() {
       tpa:     false,
       row:     false,
       col:     false,
-      o51e:    false
+      o51e:    false,
+      box:     false, // TODO
     };
     for (var i = 0; i < numInCol; i++) {
       // check whether this row is solid
@@ -216,11 +219,6 @@ function getMatches() {
             comboStats.enhance += 1;
           }
           comboStats.orbs += 1;
-          pushAnimation({timeLeft: 10,
-                         type:     "erase",
-                         color:    board[i][j].color, // TODO: Add support for blinds, locks and enhance here
-                         i:        i,
-                         j:        j});
         } else {
           isRow = false;
         }
@@ -251,20 +249,27 @@ function getMatches() {
       comboStats.o51e = true;
     }
     // TODO add minOrbs functionality here, remove combo if less
-    for (var i = 0; i < numInCol; i++) {
-      for (var j = 0; j < numInRow; j++) {
-        if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
-          board[i][j].color = -1;
+    if (comboStats.orbs >= gameRules.minMatch) {
+      for (var i = 0; i < numInCol; i++) {
+        for (var j = 0; j < numInRow; j++) {
+          if (boardMask[i][j].matched && boardMask[i][j].comboId == comboId) {
+            pushAnimation({timeLeft: 0.5,
+                           type:     "erase",
+                           color:    board[i][j].color, // TODO: Add support for blinds, locks and enhance here
+                           i:        i,
+                           j:        j});
+            board[i][j].color = -1;
+          }
         }
       }
+      // Animate combo
+      pushAnimation({timeLeft: 0.5, type: "pause"});
+      for (var i = 0; i < 0.5 / deltaT; i++) {
+        pushBoard(board);
+      }
+      comboList[comboList.length] = comboStats;
+      useCombo(comboStats);
     }
-    // Animate combo
-    pushAnimation({timeLeft: 10, type: "pause"});
-    for (var i = 0; i < 10; i++) {
-      pushBoard(board);
-    }
-    comboList[comboList.length] = comboStats;
-    useCombo(comboStats);
   }
   if(comboList.length == 0) {
     endCombos();
@@ -318,6 +323,7 @@ boardMouseMove = function(row, col) {
 };
 
 setInterval(function() {
+  // TODO Valten orbs
   if (moved) {
     timeLeft = (gameRules.moveTime - (new Date() - timeMoveStarted) / 1000.) / gameRules.moveTime;
     if (timeLeft <= 0) {
@@ -328,7 +334,7 @@ setInterval(function() {
       getMatches();
     }
   }
-}, 50);
+}, deltaT * 1000);
 
 getNumInRow = function() { return numInRow; };
 getNumInCol = function() { return numInCol; };

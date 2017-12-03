@@ -9,6 +9,7 @@ var getFallbackSrc;
 var pushAnimation;
 var registerAnimation;
 var animationRunning;
+var deltaT = 0.051;
 
 (function() {
 
@@ -43,7 +44,7 @@ function redraw() {
   scenes[scene].redraw(renderer);
   if (animationList.length > 0) {
     for (var animation of animationList) {
-      animation.timeLeft -= 1;
+      animation.timeLeft -= deltaT;
       if (animation.type == "pause") {
         break;
       }
@@ -125,7 +126,7 @@ animationRunning = function() {
 
 initUi = function() {
   renderer = document.getElementById("board").getContext("2d");
-  setInterval(redraw, 50);
+  setInterval(redraw, deltaT * 1000);
   mouseHandler();
 };
 

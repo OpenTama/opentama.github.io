@@ -130,7 +130,7 @@ function drawOrb(renderer, orb, col, row, drawSelection) {
 }
 
 function drawErase(renderer, animation) {
-  renderer.globalAlpha = animation.timeLeft / 10;
+  renderer.globalAlpha = Math.max(2 * animation.timeLeft, 0);
   renderer.drawImage(orbAssets[animation.color],
                      getBoardWidth() * animation.j / getNumInRow(),
                      getBoardHeight() * animation.i / getNumInCol() + getTopHeight(),

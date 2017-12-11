@@ -40,18 +40,28 @@ drawTeam = function(renderer, y, assists, skipEmpty, damage) {
     renderer.drawImage(teamAssets[i], getBoardWidth() * ((i % 6) + 0.05) / 6, y, getBoardWidth() * 0.9 / 6, getBoardWidth() * 0.9 / 6);
     if (!assists && damage != null) {
       if (damage[i-6] != 0) {
+        renderer.fillStyle = "#ffffff";
+        renderer.font = "bolder " + (getBoardWidth() * 0.03) + "px Sans";
+        renderer.fillText(Math.ceil(damage[i-6]), getBoardWidth() * ((i % 6) + 0.48) / 6, y + getBoardWidth() * 0.27 * 0.9 / 6);
+        renderer.fillText(Math.ceil(damage[i-6]), getBoardWidth() * ((i % 6) + 0.52) / 6, y + getBoardWidth() * 0.23 * 0.9 / 6);
         renderer.fillStyle = "#000000";
-        renderer.font = "bolder " + (getBoardWidth() * 0.031) + "px Sans";
-        renderer.fillText(Math.ceil(damage[i-6]), getBoardWidth() * ((i % 6) + 0.5) / 6, y + getBoardWidth() * 0.25 * 0.9 / 6);
-        renderer.fillStyle = "#FFFFFF";
+        renderer.font = "bolder " + (getBoardWidth() * 0.03) + "px Sans";
+        renderer.fillText(Math.ceil(damage[i-6]), getBoardWidth() * ((i % 6) + 0.49) / 6, y + getBoardWidth() * 0.26 * 0.9 / 6);
+        renderer.fillText(Math.ceil(damage[i-6]), getBoardWidth() * ((i % 6) + 0.51) / 6, y + getBoardWidth() * 0.24 * 0.9 / 6);
+        renderer.fillStyle = attColor(getTeam()[i].att[0]);
         renderer.font = "bolder " + (getBoardWidth() * 0.03) + "px Sans";
         renderer.fillText(Math.ceil(damage[i-6]), getBoardWidth() * ((i % 6) + 0.5) / 6, y + getBoardWidth() * 0.25 * 0.9 / 6);
       }
       if (damage[i] != 0) {
+        renderer.fillStyle = "#ffffff";
+        renderer.font = "bolder" + (getBoardWidth() * 0.03) + "px Sans";
+        renderer.fillText(Math.ceil(damage[i]), getBoardWidth() * ((i % 6) + 0.48) / 6, y + getBoardWidth() * 0.77 * 0.9 / 6);
+        renderer.fillText(Math.ceil(damage[i]), getBoardWidth() * ((i % 6) + 0.52) / 6, y + getBoardWidth() * 0.73 * 0.9 / 6);
         renderer.fillStyle = "#000000";
-        renderer.font = "bolder" + (getBoardWidth() * 0.031) + "px Sans";
-        renderer.fillText(Math.ceil(damage[i]), getBoardWidth() * ((i % 6) + 0.5) / 6, y + getBoardWidth() * 0.75 * 0.9 / 6);
-        renderer.fillStyle = "#FFFFFF";
+        renderer.font = "bolder" + (getBoardWidth() * 0.03) + "px Sans";
+        renderer.fillText(Math.ceil(damage[i]), getBoardWidth() * ((i % 6) + 0.49) / 6, y + getBoardWidth() * 0.76 * 0.9 / 6);
+        renderer.fillText(Math.ceil(damage[i]), getBoardWidth() * ((i % 6) + 0.51) / 6, y + getBoardWidth() * 0.74 * 0.9 / 6);
+        renderer.fillStyle = attColor(getTeam()[i].att[1]);
         renderer.font = "bolder" + (getBoardWidth() * 0.03) + "px Sans";
         renderer.fillText(Math.ceil(damage[i]), getBoardWidth() * ((i % 6) + 0.5) / 6, y + getBoardWidth() * 0.75 * 0.9 / 6);
       }

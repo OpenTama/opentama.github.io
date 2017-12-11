@@ -9,6 +9,7 @@ var getFallbackSrc;
 var pushAnimation;
 var registerAnimation;
 var animationRunning;
+var attColor;
 var deltaT = 0.021;
 
 (function() {
@@ -128,6 +129,23 @@ initUi = function() {
   renderer = document.getElementById("board").getContext("2d");
   setInterval(redraw, deltaT * 1000);
   mouseHandler();
+};
+
+attColor = function(att) {
+  switch(att) {
+    case 0:
+      return "#dd0000";
+    case 1:
+      return "#0000dd";
+    case 2:
+      return "#00bb00";
+    case 3:
+      return "#dddd00";
+    case 4:
+      return "#9900bb";
+    default:
+      return "#dddddd";
+  }
 };
 
 })();

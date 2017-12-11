@@ -88,6 +88,7 @@ function cascade(skyfall) {
         }
       }
       pushBoard(board);
+      pushDamage(getDamage());
     }
   }
   if (gameRules.skyfall || !skyfall) {
@@ -245,7 +246,6 @@ function getMatches() {
     if (comboStats.orbs == 5 && comboStats.enhance > 0){
       comboStats.o51e = true;
     }
-    // TODO add minOrbs functionality here, remove combo if less
     if (comboStats.orbs >= gameRules.minMatch) {
       for (var i = 0; i < gameRules.numInCol; i++) {
         for (var j = 0; j < gameRules.numInRow; j++) {
@@ -259,13 +259,13 @@ function getMatches() {
           }
         }
       }
-      // Animate combo
+      comboList[comboList.length] = comboStats;
+      useCombo(comboStats);
       pushAnimation({timeLeft: 0.5, type: "pause"});
       for (var i = 0; i < 0.5 / deltaT; i++) {
         pushBoard(board);
+        pushDamage(getDamage());
       }
-      comboList[comboList.length] = comboStats;
-      useCombo(comboStats);
     }
   }
   if(comboList.length == 0) {

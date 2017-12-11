@@ -10,6 +10,9 @@ monsters[0] = {
   lskill:  [{type: "none"}],
   assetId: 0,
   rarity:  -1,
+  atk:     0,
+  hp:      0,
+  rcv:     0,
   att:     [-1, -1],
   type:    [-1, -1, -1]
 };

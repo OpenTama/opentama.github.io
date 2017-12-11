@@ -115,7 +115,7 @@ function mousedown(x, y) {
   if (y4 > 0 && y4 % 0.19 < 0.15 && y4 < 0.53 && x4 % 0.19 < 0.15 && x4 > 0 && x4 < 0.91) {
     monsterChosen = queryMonsters(monsterConstraints)[Math.floor(x4 / 0.19) + Math.floor(y4 / 0.19) * 5 + page * 15];
     if (monsterChosen != undefined) {
-      team[getTeammateSelected()] = monsterChosen;
+      getTeam()[getTeammateSelected()] = monsterChosen;
       setScene("team/dash");
     }
   }

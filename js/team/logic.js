@@ -5,11 +5,12 @@ var queryMonsters;
 var getHp;
 var getMaxHp;
 var getTeam;
+var getDamage;
 
 (function(){
 
-teamCombos = [];
-team = [
+var teamCombos = [];
+var team = [
   getMonsters()[0],
   getMonsters()[0],
   getMonsters()[0],
@@ -24,13 +25,28 @@ team = [
   getMonsters()[0]
 ];
 
+var baseDamage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var damage = baseDamage;
+
 useCombo = function(comboStats) {
   teamCombos.push(comboStats);
-  // TODO
+  orbMultiplier = 1 + (comboStats.orbs - 3) * 0.25;
+  comboMultiplier = 1 + (teamCombos.length - 1) * 0.25;
+  for (var i = 0; i < 6; i++) {
+    baseDamage[i] += (team[i+6].att[0] == comboStats.att) * team[i+6].atk * orbMultiplier;
+    baseDamage[i+6] += (team[i+6].att[1] == comboStats.att) * team[i+6].atk * orbMultiplier /
+                       (team[i+6].att[0] == team[i+6].att[1] ? 10 : 3);
+  }
+  damage = baseDamage.map(function(x){ return x * comboMultiplier; });
+  // TODO draw value
+  // TODO everything
 }
 
 endCombos = function() {
   // TODO
+  baseDamage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  damage = baseDamage;
+  teamCombos = [];
 }
 
 getGameRules = function() {
@@ -55,7 +71,6 @@ getGameRules = function() {
         minMatch = Math.max(component.orbs + 1, minMatch);
     }
   }
-  console.log(moveTime);
   return {
     skyfall:  skyfall,
     moveTime: moveTime,
@@ -77,5 +92,6 @@ queryMonsters = function(constraint) {
 getHp = function() { return 10; };
 getMaxHp = function() { return 100; };
 getTeam = function() { return team; };
+getDamage = function() { return damage; }
 
 })()

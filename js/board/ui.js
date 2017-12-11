@@ -1,4 +1,5 @@
 var pushBoard;
+var pushDamage;
 
 (function() {
 
@@ -41,13 +42,15 @@ var bgAssets = [
   loadImage("assets/bg1.png")
 ];
 var renderQueue = [];
+var damageQueue = [];
 
 function redraw(renderer) {
   // Queue is empty when orbs are being moved
-  var toDraw = renderQueue.shift();
+  toDraw = renderQueue.shift();
   if (toDraw == undefined) {
     toDraw = getBoard();
   }
+  damage = damageQueue.shift();
   for (var i = 0; i < getNumInCol(); i++) {
     for (var j = 0; j < getNumInRow(); j++) {
       // draw background
@@ -80,7 +83,7 @@ function redraw(renderer) {
   renderer.fillStyle = "#333333";
   renderer.fillRect(0, 0, getBoardWidth(), getTopHeight());
   drawHpBar(renderer);
-  drawTeam(renderer, getTopHeight() - getBoardWidth() * 0.2, false);
+  drawTeam(renderer, getTopHeight() - getBoardWidth() * 0.2, false, true, damage);
 }
 
 function drawHpBar(renderer) {
@@ -203,6 +206,10 @@ registerAnimation("erase", drawErase);
 
 pushBoard = function(board) {
   renderQueue.push(JSON.parse(JSON.stringify(board)));
+};
+
+pushDamage = function(damage) {
+  damageQueue.push(JSON.parse(JSON.stringify(damage)));
 };
 
 })()

@@ -71,7 +71,8 @@ function redraw(renderer) {
 function drawResults(renderer, results) {
   for (var i = 0; i < Math.min(results.length - page * 15, searchAssets.length); i++) {
     if (searchAssets[i].src == getFallbackSrc()) {
-      monsters.splice(monsters.indexOf(results[i + page * 15]), 1);
+      console.log("Duplicate monster found",results[i + page * 15]);
+      getMonsters().splice(getMonsters().indexOf(results[i + page * 15]), 1);
     }
     var desiredSrc = "http://puzzledragonx.com/en/img/book/" + results[i + page * 15].assetId + ".png"
     if (searchAssets[i].src != desiredSrc) {

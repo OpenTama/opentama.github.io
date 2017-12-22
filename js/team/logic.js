@@ -71,6 +71,11 @@ getGameRules = function() {
         minMatch = Math.max(component.orbs + 1, minMatch);
     }
   }
+  for (var component of team[6].lskill.concat(team[11].lskill)) {
+    if (component.type == "4 seconds") {
+      moveTime = 4;
+    }
+  }
   return {
     skyfall:  skyfall,
     moveTime: moveTime,
@@ -89,8 +94,16 @@ queryMonsters = function(constraint) {
   });
 };
 
+getMaxHp = function() {
+  maxHp = 0;
+  for (i = 6; i < 12; i++) {
+    maxHp += team[i].hp;
+    // TODO Assist HP
+  }
+  return maxHp;
+};
+
 getHp = function() { return 10; };
-getMaxHp = function() { return 100; };
 getTeam = function() { return team; };
 getDamage = function() { return damage; }
 

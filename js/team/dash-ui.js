@@ -17,9 +17,9 @@ function redraw(renderer) {
   renderer.textAlign = "left";
   renderer.fillStyle = "#333333";
   renderer.fillText("ASSISTS:", getBoardWidth() * 0.025, getBoardWidth() * 0.1);
-  drawTeam(renderer, getBoardWidth() * 0.15, true, false, null);
   renderer.fillText("TEAM:", getBoardWidth() * 0.025, getBoardWidth() * 0.4);
   drawTeam(renderer, getBoardWidth() * 0.45, false, false, null);
+  drawTeam(renderer, getBoardWidth() * 0.15, true, false, null);
   renderer.fillStyle = "#444499";
   renderer.font = (getBoardWidth() * 0.03) + "px Sans";
   renderer.textAlign = "left";

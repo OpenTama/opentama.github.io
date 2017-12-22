@@ -26,7 +26,6 @@ var fallbackSrc = "\\"
 var animationList = [];
 
 function redraw() {
-  // TODO variable frame rate
   // Draw bottom buttons
   renderer.globalAlpha = 1;
   renderer.textBaseline = 'middle';

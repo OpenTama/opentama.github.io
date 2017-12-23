@@ -27,8 +27,12 @@ var team = [
 
 var baseDamage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var damage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var baseRcv = [0, 0, 0, 0, 0, 0];
+var rcv = 0;
+var hp = 1;
 
 useCombo = function(comboStats) {
+  rcv = 0;
   teamCombos.push(comboStats);
   orbMultiplier = 1 + (comboStats.orbs - 3) * 0.25;
   comboMultiplier = 1 + (teamCombos.length - 1) * 0.25;
@@ -36,20 +40,26 @@ useCombo = function(comboStats) {
     baseDamage[i] += (team[i+6].att[0] == comboStats.att) * team[i+6].atk * orbMultiplier;
     baseDamage[i+6] += (team[i+6].att[1] == comboStats.att) * team[i+6].atk * orbMultiplier /
                        (team[i+6].att[0] == team[i+6].att[1] ? 10 : 3);
+    if (comboStats.att == 5) {
+      baseRcv[i] += team[i+6].rcv;
+    }
   }
   for (var i = 0; i < 6; i++) {
-    var LSMultiplier = 1;
+    var atkMultiplier = 1;
+    var rcvMultiplier = 1;
     for (var component of team[6].lskill.concat(team[11].lskill)) {  // TODO binds
       switch (component.type) {
         case "passive boost":
           if (receivesBoost(component.requirement, team[i+6].att, team[i+6].type)) {
-            LSMultiplier *= component.atk;
+            atkMultiplier *= component.atk;
+            rcvMultiplier *= component.rcv;
           }
           break;
       }
     }
-    damage[i] = baseDamage[i] * comboMultiplier * LSMultiplier;
-    damage[i+6] = baseDamage[i+6] * comboMultiplier * LSMultiplier;
+    damage[i] = baseDamage[i] * comboMultiplier * atkMultiplier;
+    damage[i+6] = baseDamage[i+6] * comboMultiplier * atkMultiplier;
+    rcv += baseRcv[i] * comboMultiplier * rcvMultiplier;
   }
   // TODO draw multiplier
 }
@@ -58,6 +68,9 @@ endCombos = function() {
   // TODO
   baseDamage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   damage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  baseRcv = [0, 0, 0, 0, 0, 0];
+  hp = Math.min(hp + rcv, getMaxHp());
+  rcv = 0;
   teamCombos = [];
 }
 
@@ -126,8 +139,9 @@ getMaxHp = function() {
   // TODO floor or ceil?
 };
 
-getHp = function() { return 10; };
+getHp = function() { return hp; };
 getTeam = function() { return team; };
 getDamage = function() { return damage; };
+getRcv = function() { return rcv; };
 
 })()

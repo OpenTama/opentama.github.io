@@ -89,6 +89,8 @@ function cascade(skyfall) {
       }
       pushBoard(board);
       pushDamage(getDamage());
+      pushRcv(getRcv());
+      pushHp(getHp());
     }
   }
   if (gameRules.skyfall || !skyfall) {
@@ -108,7 +110,6 @@ function getMatches() {
   }
 
   var combos = 0; // Not yet how many combos, but how many groups of three
-  // TODO: support no-match-3 - how about orb unbinds?
   // TODO: support unable to match attribute effect
   // Animation goes left to right, then bottom to top
   for (var i = gameRules.numInCol - 1; i >= 0; i--) {
@@ -265,6 +266,8 @@ function getMatches() {
       for (var i = 0; i < 0.5 / deltaT; i++) {
         pushBoard(board);
         pushDamage(getDamage());
+        pushRcv(getRcv());
+        pushHp(getHp());
       }
     }
   }

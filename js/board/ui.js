@@ -1,5 +1,7 @@
 var pushBoard;
 var pushDamage;
+var pushRcv;
+var pushHp;
 
 (function() {
 
@@ -43,6 +45,8 @@ var bgAssets = [
 ];
 var renderQueue = [];
 var damageQueue = [];
+var rcvQueue = [];
+var hpQueue = [];
 
 function redraw(renderer) {
   // Queue is empty when orbs are being moved
@@ -87,20 +91,47 @@ function redraw(renderer) {
 }
 
 function drawHpBar(renderer) {
+  var rcv = rcvQueue.shift();
+  var hp = hpQueue.shift();
+  if (hp == undefined) {
+    hp = getHp();
+  }
   renderer.fillStyle = "#CCCCCC";
   renderer.fillRect(getBoardWidth() * 0.1, getTopHeight() - getBoardWidth() * 0.05, getBoardWidth() * 0.88, getBoardWidth() * 0.05);
   renderer.fillRect(getBoardWidth() * 0.03, getTopHeight() - getBoardWidth() * 0.05, getBoardWidth() * 0.05, getBoardWidth() * 0.05);
   renderer.fillStyle = "#333333";
   renderer.fillRect(getBoardWidth() * 0.11, getTopHeight() - getBoardWidth() * 0.04, getBoardWidth() * 0.86, getBoardWidth() * 0.03);
   renderer.fillStyle = "#DD4444";
-  renderer.fillRect(getBoardWidth() * 0.11, getTopHeight() - getBoardWidth() * 0.04, (getBoardWidth() * 0.86) * getHp() / getMaxHp(), getBoardWidth() * 0.03);
+  renderer.fillRect(getBoardWidth() * 0.11, getTopHeight() - getBoardWidth() * 0.04, getBoardWidth() * 0.86 * hp / getMaxHp(), getBoardWidth() * 0.03);
+  if (rcv != undefined && rcv != 0) {
+    renderer.fillStyle = "#FFBBBB";
+    renderer.fillRect(getBoardWidth() * (0.11 + 0.86 * hp / getMaxHp()), getTopHeight() - getBoardWidth() * 0.04,
+                      getBoardWidth() * 0.86 * Math.min(rcv, getMaxHp() - hp) / getMaxHp(), getBoardWidth() * 0.03);
+    renderer.fillStyle = "#000000";
+    renderer.font = "bolder " + (getBoardWidth() * 0.036) + "px Sans";
+    renderer.textAlign = "center";
+    renderer.fillText("+" + rcv, getBoardWidth() * 0.54, getTopHeight() - getBoardWidth() * 0.012);
+    renderer.fillStyle = "#00FF00";
+    renderer.font = "bolder " + (getBoardWidth() * 0.035) + "px Sans";
+    renderer.fillText("+" + rcv, getBoardWidth() * 0.54, getTopHeight() - getBoardWidth() * 0.012);
+  }
   renderer.fillStyle = "#000000";
   renderer.font = "bolder " + (getBoardWidth() * 0.036) + "px Sans";
   renderer.textAlign = "right";
-  renderer.fillText(getHp() + "/" + getMaxHp(), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
-  renderer.fillStyle = "#00FF00";
+  renderer.fillText(hp + "/" + getMaxHp(), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
+  if (hp == getMaxHp()) {
+    renderer.fillStyle = "#00FF00";
+  } else if (hp >= getMaxHp() * 0.8) {
+    renderer.fillStyle = "#2222FF";
+  } else if (hp >= getMaxHp() * 0.5) {
+    renderer.fillStyle = "#DDDD00";
+  } else if (hp >= getMaxHp() * 0.2) {
+    renderer.fillStyle = "#FF6600";
+  } else {
+    renderer.fillStyle = "#FF2222";
+  }
   renderer.font = "bolder " + (getBoardWidth() * 0.035) + "px Sans";
-  renderer.fillText(getHp() + "/" + getMaxHp(), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
+  renderer.fillText(hp + "/" + getMaxHp(), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
   renderer.drawImage(orbAssets[5], getBoardWidth() * 0.03, getTopHeight() - getBoardWidth() * 0.05, getBoardWidth() * 0.05, getBoardWidth() * 0.05);
 }
 
@@ -210,6 +241,14 @@ pushBoard = function(board) {
 
 pushDamage = function(damage) {
   damageQueue.push(JSON.parse(JSON.stringify(damage)));
+};
+
+pushRcv = function(rcv) {
+  rcvQueue.push(rcv);
+};
+
+pushHp = function(hp) {
+  hpQueue.push(hp);
 };
 
 })()

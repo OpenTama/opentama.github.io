@@ -26,7 +26,7 @@ var team = [
 ];
 
 var baseDamage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-var damage = baseDamage;
+var damage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 useCombo = function(comboStats) {
   teamCombos.push(comboStats);
@@ -37,15 +37,27 @@ useCombo = function(comboStats) {
     baseDamage[i+6] += (team[i+6].att[1] == comboStats.att) * team[i+6].atk * orbMultiplier /
                        (team[i+6].att[0] == team[i+6].att[1] ? 10 : 3);
   }
-  damage = baseDamage.map(function(x){ return x * comboMultiplier; });
-  // TODO draw value
-  // TODO everything
+  for (var i = 0; i < 6; i++) {
+    var LSMultiplier = 1;
+    for (var component of team[6].lskill.concat(team[11].lskill)) {  // TODO binds
+      switch (component.type) {
+        case "passive boost":
+          if (receivesBoost(component.requirement, team[i+6].att, team[i+6].type)) {
+            LSMultiplier *= component.atk;
+          }
+          break;
+      }
+    }
+    damage[i] = baseDamage[i] * comboMultiplier * LSMultiplier;
+    damage[i+6] = baseDamage[i+6] * comboMultiplier * LSMultiplier;
+  }
+  // TODO draw multiplier
 }
 
 endCombos = function() {
   // TODO
   baseDamage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  damage = baseDamage;
+  damage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   teamCombos = [];
 }
 
@@ -97,14 +109,25 @@ queryMonsters = function(constraint) {
 getMaxHp = function() {
   maxHp = 0;
   for (i = 6; i < 12; i++) {
-    maxHp += team[i].hp;
-    // TODO Assist HP
+    var LSMultiplier = 1;
+    for (var component of team[6].lskill.concat(team[11].lskill)) {
+      switch (component.type) {
+        case "passive boost":
+          if (receivesBoost(component.requirement, team[i].att, team[i].type)) {
+            LSMultiplier *= component.hp;
+          }
+          break;
+      }
+    }
+    maxHp += team[i].hp * LSMultiplier;
   }
   return maxHp;
+  // TODO assist HP
+  // TODO floor or ceil?
 };
 
 getHp = function() { return 10; };
 getTeam = function() { return team; };
-getDamage = function() { return damage; }
+getDamage = function() { return damage; };
 
 })()

@@ -1,4 +1,5 @@
 var getMonsters;
+var receivesBoost;
 
 (function(){
 
@@ -193,6 +194,24 @@ function processMonsters(data) {
   }
   console.log("data loaded")
 };
+
+receivesBoost = function(boosted, atts, types) {
+  if (boosted.length == 0 || boosted.includes("All") || boosted.includes("all")) {
+    return true;
+  }
+  for (att of atts) {
+    if (boosted.includes(["Fire", "Water", "Wood", "Light", "Dark"][att])) {
+      return true;
+    }
+  }
+  for (type of types) {
+    if (boosted.includes([null, "Balanced", "Physical", "Healer", "Dragon", "God", "Attacker",
+                          "Devil", "Machine", null, null, null, null, "Enhance Meterial", null][type])) {
+      return true;
+    }
+  }
+  return false;
+}
 
 getMonsters = function() { return monsters; };
 

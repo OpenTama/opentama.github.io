@@ -80,17 +80,13 @@ function cascade(skyfall) {
     if (!hasCascade) {
       break;
     }
-    pushAnimation({timeLeft: 0.25, type: "pause"});
     for (var x = 0; x < 0.25 / deltaT; x++) {
       for(var i = 0; i < gameRules.numInCol; i++) {
         for(var j = 0; j < gameRules.numInRow; j++) {
           board[i][j].offset = Math.max(board[i][j].offset - 4 * deltaT, 0);
         }
       }
-      pushBoard(board);
-      pushDamage(getDamage());
-      pushRcv(getRcv());
-      pushHp(getHp());
+      endAnimation(deltaT);
     }
   }
   if (gameRules.skyfall || !skyfall) {
@@ -262,16 +258,11 @@ function getMatches() {
       }
       comboList[comboList.length] = comboStats;
       useCombo(comboStats);
-      pushAnimation({timeLeft: 0.5, type: "pause"});
-      for (var i = 0; i < 0.5 / deltaT; i++) {
-        pushBoard(board);
-        pushDamage(getDamage());
-        pushRcv(getRcv());
-        pushHp(getHp());
-      }
+      endAnimation(0.5);
     }
   }
   if(comboList.length == 0) {
+    endAnimation(1);
     endCombos();
     if (!gameRules.skyfall) {
       cascade(true);

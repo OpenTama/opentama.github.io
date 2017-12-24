@@ -10,6 +10,7 @@ var pushAnimation;
 var registerAnimation;
 var animationRunning;
 var attColor;
+var endAnimation;
 var deltaT = 0.021;
 
 (function() {
@@ -31,12 +32,12 @@ function redraw() {
   renderer.textBaseline = 'middle';
   renderer.textAlign = "center";
   renderer.font = (barHeight / 2) + "px Arial";
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillRect(0, boardHeight + topHeight, boardWidth, barHeight);
-  renderer.fillStyle = "#444499";
+  renderer.fillStyle = "#6666bb";
   renderer.fillRect(barHeight * 0.05, boardHeight + topHeight + barHeight * 0.05, boardWidth / 2 - barHeight * 0.075, barHeight * 0.9);
   renderer.fillRect(boardWidth / 2 + barHeight * 0.025, boardHeight + topHeight + barHeight * 0.05, boardWidth / 2 - barHeight * 0.075, barHeight * 0.9);
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillText(scenes[scene].left.text, boardWidth * 0.25, boardHeight + topHeight + barHeight / 2);
   renderer.fillText(scenes[scene].right.text, boardWidth * 0.75, boardHeight + topHeight + barHeight / 2);
   renderer.clearRect(0, 0, boardWidth, boardHeight + topHeight);
@@ -133,18 +134,28 @@ initUi = function() {
 attColor = function(att) {
   switch(att) {
     case 0:
-      return "#dd0000";
+      return "#ff6666";
     case 1:
-      return "#0000dd";
+      return "#6666ff";
     case 2:
-      return "#00bb00";
+      return "#66ff66";
     case 3:
-      return "#dddd00";
+      return "#dddd22";
     case 4:
-      return "#9900bb";
+      return "#dd66ff";
     default:
       return "#dddddd";
   }
 };
+
+endAnimation = function(time) {
+  pushAnimation({timeLeft: time, type: "pause"});
+  for (var i = 0; i < time / deltaT; i++) {
+    pushBoard(getBoard());
+    pushDamage(getDamage());
+    pushRcv(getRcv());
+    pushHp(getHp());
+  }
+}
 
 })();

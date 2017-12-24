@@ -84,7 +84,7 @@ function redraw(renderer) {
                         getBoardHeight() / 50);
     }
   }
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillRect(0, 0, getBoardWidth(), getTopHeight());
   drawHpBar(renderer);
   drawTeam(renderer, getTopHeight() - getBoardWidth() * 0.2, false, true, damage);
@@ -99,7 +99,7 @@ function drawHpBar(renderer) {
   renderer.fillStyle = "#CCCCCC";
   renderer.fillRect(getBoardWidth() * 0.1, getTopHeight() - getBoardWidth() * 0.05, getBoardWidth() * 0.88, getBoardWidth() * 0.05);
   renderer.fillRect(getBoardWidth() * 0.03, getTopHeight() - getBoardWidth() * 0.05, getBoardWidth() * 0.05, getBoardWidth() * 0.05);
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillRect(getBoardWidth() * 0.11, getTopHeight() - getBoardWidth() * 0.04, getBoardWidth() * 0.86, getBoardWidth() * 0.03);
   renderer.fillStyle = "#DD4444";
   renderer.fillRect(getBoardWidth() * 0.11, getTopHeight() - getBoardWidth() * 0.04, getBoardWidth() * 0.86 * hp / getMaxHp(), getBoardWidth() * 0.03);
@@ -110,15 +110,15 @@ function drawHpBar(renderer) {
     renderer.fillStyle = "#000000";
     renderer.font = "bolder " + (getBoardWidth() * 0.036) + "px Sans";
     renderer.textAlign = "center";
-    renderer.fillText("+" + rcv, getBoardWidth() * 0.54, getTopHeight() - getBoardWidth() * 0.012);
+    renderer.fillText("+" + Math.floor(rcv), getBoardWidth() * 0.54, getTopHeight() - getBoardWidth() * 0.012);
     renderer.fillStyle = "#00FF00";
     renderer.font = "bolder " + (getBoardWidth() * 0.035) + "px Sans";
-    renderer.fillText("+" + rcv, getBoardWidth() * 0.54, getTopHeight() - getBoardWidth() * 0.012);
+    renderer.fillText("+" + Math.floor(rcv), getBoardWidth() * 0.54, getTopHeight() - getBoardWidth() * 0.012);
   }
   renderer.fillStyle = "#000000";
   renderer.font = "bolder " + (getBoardWidth() * 0.036) + "px Sans";
   renderer.textAlign = "right";
-  renderer.fillText(hp + "/" + getMaxHp(), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
+  renderer.fillText(Math.floor(hp) + "/" + Math.floor(getMaxHp()), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
   if (hp == getMaxHp()) {
     renderer.fillStyle = "#00FF00";
   } else if (hp >= getMaxHp() * 0.8) {
@@ -131,7 +131,7 @@ function drawHpBar(renderer) {
     renderer.fillStyle = "#FF2222";
   }
   renderer.font = "bolder " + (getBoardWidth() * 0.035) + "px Sans";
-  renderer.fillText(hp + "/" + getMaxHp(), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
+  renderer.fillText(Math.floor(hp) + "/" + Math.floor(getMaxHp()), getBoardWidth() * 0.97, getTopHeight() - getBoardWidth() * 0.012);
   renderer.drawImage(orbAssets[5], getBoardWidth() * 0.03, getTopHeight() - getBoardWidth() * 0.05, getBoardWidth() * 0.05, getBoardWidth() * 0.05);
 }
 
@@ -176,12 +176,12 @@ function drawErase(renderer, animation) {
 function confirmLeave(renderer) {
   redraw(renderer);
   renderer.globalAlpha = 0.8;
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillRect(0, 0, getBoardWidth(), getBoardHeight() + getTopHeight());
   renderer.globalAlpha = 1;
-  renderer.fillStyle = "#444499";
+  renderer.fillStyle = "#6666bb";
   renderer.fillRect(getBoardWidth() * 0.2, (getBoardHeight() + getTopHeight()) * 0.4, getBoardWidth() * 0.6, (getBoardHeight() + getTopHeight()) * 0.2);
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.textAlign = "center";
   renderer.fillText("LEAVE DUNGEON?", getBoardWidth() / 2, (getBoardHeight() + getTopHeight()) / 2);
 }

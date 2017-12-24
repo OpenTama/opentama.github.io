@@ -33,12 +33,12 @@ var monsterConstraints = {type: 12, att1: 6, att2: 6, rarity: 0};
 
 function redraw(renderer) {
   var searchResults = queryMonsters(monsterConstraints);
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillRect(0, 0, getBoardWidth(), getBoardHeight() + getTopHeight());
-  renderer.fillStyle = "#444499";
+  renderer.fillStyle = "#6666bb";
   renderer.fillRect(0, 0, getBoardWidth(), getTopHeight());
   drawResults(renderer, searchResults);
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.textBaseline = "middle";
   renderer.fillText("Main Att", getBoardWidth() * 0.045, getBoardWidth() * 0.1);
   renderer.fillText("Sub Att", getBoardWidth() * 0.045, getBoardWidth() * 0.2);
@@ -56,10 +56,10 @@ function redraw(renderer) {
     if (monsterConstraints.rarity == i) {
       renderer.fillRect(getBoardWidth() * (0.35 + 0.055 * i), getBoardWidth() * 0.5,
                         i == 10 ? getBoardWidth() * 0.085 : getBoardWidth() * 0.055, getBoardWidth() * 0.09);
-      renderer.fillStyle = "#444499";
+      renderer.fillStyle = "#6666bb";
     }
     renderer.fillText(i == 0 ? "?" : i, getBoardWidth() * (0.36 + 0.055 * i), getBoardWidth() * 0.55);
-    renderer.fillStyle = "#333333";
+    renderer.fillStyle = "#444444";
   }
   renderer.globalAlpha = 0.5;
   renderer.fillRect(getBoardWidth() * (0.35 + 0.09 * monsterConstraints.att1), getBoardWidth() * 0.05, getBoardWidth() * 0.09, getBoardWidth() * 0.09);
@@ -82,14 +82,14 @@ function drawResults(renderer, results) {
                        getBoardWidth() * 0.15, getBoardWidth() * 0.15);
   }
   renderer.textAlign = "left";
-  renderer.fillStyle = "#444499";
+  renderer.fillStyle = "#6666bb";
   renderer.fillText("RESULTS:", getBoardWidth() * 0.045, getBoardWidth() * 0.08 + getTopHeight());
-  renderer.fillStyle = "#444499";
+  renderer.fillStyle = "#6666bb";
   renderer.fillText("Page " + (page + 1) + " of " + (Math.floor(results.length / 15) + 1),
                     getBoardWidth() * 0.3, getBoardHeight() + getTopHeight() - getBoardWidth() * 0.08);
   renderer.fillRect(getBoardWidth() * 0.035, getBoardHeight() + getTopHeight() - getBoardWidth() * 0.13, getBoardWidth() * 0.23, getBoardWidth() * 0.09)
   renderer.fillRect(getBoardWidth() * 0.735, getBoardHeight() + getTopHeight() - getBoardWidth() * 0.13, getBoardWidth() * 0.23, getBoardWidth() * 0.09)
-  renderer.fillStyle = "#333333";
+  renderer.fillStyle = "#444444";
   renderer.fillText("<- Prev", getBoardWidth() * 0.045, getBoardHeight() + getTopHeight() - getBoardWidth() * 0.08)
   renderer.fillText("Next ->", getBoardWidth() * 0.745, getBoardHeight() + getTopHeight() - getBoardWidth() * 0.08)
   renderer.globalAlpha = 0.7;

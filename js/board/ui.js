@@ -2,6 +2,10 @@ var pushBoard;
 var pushDamage;
 var pushRcv;
 var pushHp;
+var drawBoard;
+var boardUIMouseDown;
+var boardUIMouseUp;
+var boardUIMouseMove;
 
 (function() {
 
@@ -48,7 +52,7 @@ var damageQueue = [];
 var rcvQueue = [];
 var hpQueue = [];
 
-function redraw(renderer) {
+drawBoard = function(renderer) {
   // Queue is empty when orbs are being moved
   toDraw = renderQueue.shift();
   if (toDraw == undefined) {
@@ -173,20 +177,7 @@ function drawErase(renderer, animation) {
   renderer.globalAlpha = 1;
 }
   
-function confirmLeave(renderer) {
-  redraw(renderer);
-  renderer.globalAlpha = 0.8;
-  renderer.fillStyle = "#444444";
-  renderer.fillRect(0, 0, getBoardWidth(), getBoardHeight() + getTopHeight());
-  renderer.globalAlpha = 1;
-  renderer.fillStyle = "#6666bb";
-  renderer.fillRect(getBoardWidth() * 0.2, (getBoardHeight() + getTopHeight()) * 0.4, getBoardWidth() * 0.6, (getBoardHeight() + getTopHeight()) * 0.2);
-  renderer.fillStyle = "#444444";
-  renderer.textAlign = "center";
-  renderer.fillText("LEAVE DUNGEON?", getBoardWidth() / 2, (getBoardHeight() + getTopHeight()) / 2);
-}
-
-function mousedown(x, y) {
+boardUIMouseDown = function(x, y) {
   if (y > getTopHeight()) {
     var row = (y - getTopHeight()) * getNumInCol() / getBoardHeight() - .5;
     var col = x * getNumInRow() / getBoardWidth() - .5;
@@ -194,45 +185,18 @@ function mousedown(x, y) {
   }
 }
 
-function mouseup(x, y) {
+boardUIMouseUp = function(x, y) {
   var row = Math.max(Math.min(y - getTopHeight(), getBoardHeight() - 1), 1) * getNumInCol() / getBoardHeight() - .5;
   var col = x * getNumInRow() / getBoardWidth() - .5;
   boardMouseUp(row, col);
 }
 
-function mousemove(x, y) {
+boardUIMouseMove = function(x, y) {
   var row = Math.max(Math.min(y - getTopHeight(), getBoardHeight() - 1), 1) * getNumInCol() / getBoardHeight() - .5;
   var col = x * getNumInRow() / getBoardWidth() - .5;
   boardMouseMove(row, col);
 }
   
-addScene("board", {
-  redraw:    redraw,
-  mousedown: mousedown,
-  mousemove: mousemove,
-  mouseup:   mouseup,
-  left:      {text: "Dungeon", scene: "board/dungeon", action: function(){}},
-  right:     {text: "Team", scene: "board/team", action: function(){}}
-});
-
-addScene("board/dungeon", {
-  redraw:    confirmLeave,
-  mousedown: function(e) {},
-  mousemove: function(e) {},
-  mouseup:   function(e) {},
-  left:      {text: "Yes", scene: "board", action: initBoard},
-  right:     {text: "No", scene: "board", action: function(){}},
-});
-
-addScene("board/team", {
-  redraw:    confirmLeave,
-  mousedown: function(e) {},
-  mousemove: function(e) {},
-  mouseup:   function(e) {},
-  left:      {text: "Yes", scene: "team/dash", action: initBoard},
-  right:     {text: "No", scene: "board", action: function(){}},
-});
-
 registerAnimation("erase", drawErase);
 
 pushBoard = function(board) {
